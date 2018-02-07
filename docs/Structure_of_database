@@ -47,3 +47,8 @@ rate
 id
 telegram_id (ID пользователя в телеграмме)
 username
+---------------------------------------------
+Нотификации (notifications)
+id
+user_id
+frequency
