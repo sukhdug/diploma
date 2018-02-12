@@ -110,7 +110,8 @@ class BooksTable extends Table
             ->scalar('isbn')
             ->maxLength('isbn', 255)
             ->requirePresence('isbn', 'create')
-            ->notEmpty('isbn');
+            ->notEmpty('isbn')
+            ->add('isbn', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
             ->scalar('rating')
@@ -152,6 +153,7 @@ class BooksTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
+        $rules->add($rules->isUnique(['isbn']));
         $rules->add($rules->existsIn(['quote_id'], 'Quotes'));
 
         return $rules;

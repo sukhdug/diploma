@@ -32,6 +32,7 @@ class BooksFixture extends TestFixture
         'quote_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         '_constraints' => [
             'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
+            'isbn' => ['type' => 'unique', 'columns' => ['isbn'], 'length' => []],
         ],
         '_options' => [
             'engine' => 'InnoDB',
