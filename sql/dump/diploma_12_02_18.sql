@@ -146,6 +146,34 @@ LOCK TABLES `liked_books` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `notification_books`
+--
+
+DROP TABLE IF EXISTS `notification_books`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `notification_books` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `book_id` int(11) NOT NULL,
+  `review_id` int(11) NOT NULL,
+  `reader_id` int(11) NOT NULL,
+  `notification_id` int(11) NOT NULL,
+  `user_choose` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `notification_books`
+--
+
+LOCK TABLES `notification_books` WRITE;
+/*!40000 ALTER TABLE `notification_books` DISABLE KEYS */;
+/*!40000 ALTER TABLE `notification_books` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `notifications`
 --
 
@@ -328,4 +356,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-09 18:31:30
+-- Dump completed on 2018-02-12 13:26:35
