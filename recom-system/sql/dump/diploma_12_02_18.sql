@@ -60,7 +60,8 @@ CREATE TABLE `books` (
   `fromsite` varchar(45) NOT NULL,
   `reviews_count` int(11) NOT NULL,
   `quote_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `isbn` (`isbn`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -107,6 +108,8 @@ DROP TABLE IF EXISTS `genres`;
 CREATE TABLE `genres` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
+  `link_livelib` varchar(255) NOT NULL,
+  `link_litres` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -356,4 +359,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-12 13:26:35
+-- Dump completed on 2018-02-12 17:05:24
