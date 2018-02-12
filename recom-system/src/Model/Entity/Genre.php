@@ -8,6 +8,8 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string $name
+ * @property string $link_livelib
+ * @property string $link_litres
  */
 class Genre extends Entity
 {
@@ -22,6 +24,8 @@ class Genre extends Entity
      * @var array
      */
     protected $_accessible = [
-        'name' => true
+        'name' => true,
+        'link_livelib' => true,
+        'link_litres' => true
     ];
 }

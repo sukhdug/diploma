@@ -53,6 +53,18 @@ class GenresTable extends Table
             ->requirePresence('name', 'create')
             ->notEmpty('name');
 
+        $validator
+            ->scalar('link_livelib')
+            ->maxLength('link_livelib', 255)
+            ->requirePresence('link_livelib', 'create')
+            ->notEmpty('link_livelib');
+
+        $validator
+            ->scalar('link_litres')
+            ->maxLength('link_litres', 255)
+            ->requirePresence('link_litres', 'create')
+            ->notEmpty('link_litres');
+
         return $validator;
     }
 }
