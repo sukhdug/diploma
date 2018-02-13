@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model\Table;
 
 use Cake\ORM\Query;
@@ -17,8 +18,7 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\Genre[] patchEntities($entities, array $data, array $options = [])
  * @method \App\Model\Entity\Genre findOrCreate($search, callable $callback = null, $options = [])
  */
-class GenresTable extends Table
-{
+class GenresTable extends Table {
 
     /**
      * Initialize method
@@ -26,8 +26,7 @@ class GenresTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
-    {
+    public function initialize(array $config) {
         parent::initialize($config);
 
         $this->setTable('genres');
@@ -41,30 +40,49 @@ class GenresTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
-    {
+    public function validationDefault(Validator $validator) {
         $validator
-            ->integer('id')
-            ->allowEmpty('id', 'create');
+                ->integer('id')
+                ->allowEmpty('id', 'create');
 
         $validator
-            ->scalar('name')
-            ->maxLength('name', 255)
-            ->requirePresence('name', 'create')
-            ->notEmpty('name');
+                ->scalar('name')
+                ->maxLength('name', 255)
+                ->requirePresence('name', 'create')
+                ->notEmpty('name');
 
         $validator
-            ->scalar('link_livelib')
-            ->maxLength('link_livelib', 255)
-            ->requirePresence('link_livelib', 'create')
-            ->notEmpty('link_livelib');
+                ->scalar('link_livelib')
+                ->maxLength('link_livelib', 255)
+                ->requirePresence('link_livelib', 'create')
+                ->notEmpty('link_livelib');
 
         $validator
-            ->scalar('link_litres')
-            ->maxLength('link_litres', 255)
-            ->requirePresence('link_litres', 'create')
-            ->notEmpty('link_litres');
+                ->scalar('link_litres')
+                ->maxLength('link_litres', 255)
+                ->requirePresence('link_litres', 'create')
+                ->notEmpty('link_litres');
 
         return $validator;
     }
+
+    public function setGenre($genr) {
+        if ($this->save($genr)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getGenre($genrName) {
+
+        $genr = $this->find('all')->where(['name' => $genrName])->first();
+        return $genr;
+    }
+
+    public function getGenresList() {
+
+        $genres = $this->find('all');
+        return $genres;
+    }
+
 }
