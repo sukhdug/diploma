@@ -19,9 +19,6 @@ class CollectionController extends AppController
      */
     public function index()
     {
-        $collection = $this->paginate($this->Collection);
-
-        $this->set(compact('collection'));
     }
 
     /**
