@@ -1,1 +1,0 @@
-<h1>Data Collection</h1>
