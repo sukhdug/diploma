@@ -10,6 +10,7 @@ use Cake\ORM\Entity;
  * @property string $username
  * @property string $fromsite
  * @property int $reviews_count
+ * @property string $link
  *
  * @property \App\Model\Entity\NotificationBook[] $notification_books
  * @property \App\Model\Entity\RecommendedBook[] $recommended_books
@@ -31,6 +32,7 @@ class Reader extends Entity
         'username' => true,
         'fromsite' => true,
         'reviews_count' => true,
+        'link' => true,
         'notification_books' => true,
         'recommended_books' => true,
         'reviews' => true

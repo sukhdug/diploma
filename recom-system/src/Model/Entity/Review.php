@@ -9,7 +9,7 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property int $book_id
  * @property int $reader_id
- * @property int $rate
+ * @property string $rate
  *
  * @property \App\Model\Entity\Book $book
  * @property \App\Model\Entity\Reader $reader

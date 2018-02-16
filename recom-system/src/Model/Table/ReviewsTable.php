@@ -68,9 +68,9 @@ class ReviewsTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
-            ->integer('rate')
-            ->requirePresence('rate', 'create')
-            ->notEmpty('rate');
+            ->scalar('rate')
+            ->maxLength('rate', 10)
+            ->allowEmpty('rate');
 
         return $validator;
     }

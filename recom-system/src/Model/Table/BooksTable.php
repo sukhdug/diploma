@@ -115,9 +115,8 @@ class BooksTable extends Table
 
         $validator
             ->scalar('rating')
-            ->maxLength('rating', 255)
-            ->requirePresence('rating', 'create')
-            ->notEmpty('rating');
+            ->maxLength('rating', 10)
+            ->allowEmpty('rating');
 
         $validator
             ->scalar('description')

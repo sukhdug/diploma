@@ -21,8 +21,10 @@ class ReadersFixture extends TestFixture
         'username' => ['type' => 'string', 'length' => 255, 'null' => false, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'fromsite' => ['type' => 'string', 'length' => 45, 'null' => false, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'reviews_count' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'link' => ['type' => 'string', 'length' => 255, 'null' => false, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         '_constraints' => [
             'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
+            'link' => ['type' => 'unique', 'columns' => ['link'], 'length' => []],
         ],
         '_options' => [
             'engine' => 'InnoDB',
@@ -41,7 +43,8 @@ class ReadersFixture extends TestFixture
             'id' => 1,
             'username' => 'Lorem ipsum dolor sit amet',
             'fromsite' => 'Lorem ipsum dolor sit amet',
-            'reviews_count' => 1
+            'reviews_count' => 1,
+            'link' => 'Lorem ipsum dolor sit amet'
         ],
     ];
 }

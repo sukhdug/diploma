@@ -78,6 +78,13 @@ class ReadersTable extends Table
             ->requirePresence('reviews_count', 'create')
             ->notEmpty('reviews_count');
 
+        $validator
+            ->scalar('link')
+            ->maxLength('link', 255)
+            ->requirePresence('link', 'create')
+            ->notEmpty('link')
+            ->add('link', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+
         return $validator;
     }
 
@@ -91,6 +98,7 @@ class ReadersTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->isUnique(['username']));
+        $rules->add($rules->isUnique(['link']));
 
         return $rules;
     }
