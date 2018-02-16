@@ -34,21 +34,23 @@ class BooksOfGenres extends Shell {
        
         $total = $this->Genres->find()->count();
 
-        for ($id = 1; $id < $total; $id++) {
+     //   for ($id = 1; $id < $total; $id++) {
 
+            $id = 1;
             $genre = $this->Genres->findById($id)->firstOrFail();
             $pageOfGenre = $genre['link_livelib'];
             $dom = new \DOMDocument('1.0', 'UTF-8');
             $internalErrors = libxml_use_internal_errors(true);
             $dom->loadHTMLFile($pageOfGenre);
-            libxml_use_internal_errors($internalErrors);
             $finder = new \DOMXPath($dom);
             $class = "block-book-title";
             $query = sprintf("//*[contains(@class, '%s')]", $class);
             $nodes = $finder->query($query);
+            //$nodes = $dom->getElementsByTagName('a');
             foreach ($nodes as $node) {
-                $this->out($node->nodeValue);
+                $this->out($node->nodeValue . PHP_EOL);
             }
-        }
+            libxml_use_internal_errors($internalErrors);
+       // }
     }
 }

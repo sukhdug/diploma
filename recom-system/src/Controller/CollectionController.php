@@ -25,8 +25,9 @@ class CollectionController extends AppController
     {
         $total = $this->Genres->find()->count();
 
-        for ($id = 1; $id < $total; $id++) {
+      //  for ($id = 1; $id < $total; $id++) {
 
+            $id = 1;
             $genre = $this->Genres->findById($id)->firstOrFail();
             $pageOfGenre = $genre['link_livelib'];
             $dom = new \DOMDocument('1.0', 'UTF-8');
@@ -39,9 +40,10 @@ class CollectionController extends AppController
             $nodes = $finder->query($query);
             foreach ($nodes as $node) {
                 //$this->out($node->nodeValue);
-                echo $node->nodeValue. "<br>";
+                //echo $node->nodeValue. "<br>";
             }
-        }
+            echo $pageOfGenre;
+        //}
     }
 
     /**
