@@ -23,27 +23,33 @@ class CollectionController extends AppController
      */
     public function index()
     {
-        $total = $this->Genres->find()->count();
+    /*    $total = $this->Genres->find()->count();
 
-      //  for ($id = 1; $id < $total; $id++) {
+        for ($id = 1; $id < $total; $id++) {
 
-            $id = 1;
             $genre = $this->Genres->findById($id)->firstOrFail();
             $pageOfGenre = $genre['link_livelib'];
-            $dom = new \DOMDocument('1.0', 'UTF-8');
+            $dom = new \DOMDocument("1.0", "UTF-8");
             $internalErrors = libxml_use_internal_errors(true);
             $dom->loadHTMLFile($pageOfGenre);
-            libxml_use_internal_errors($internalErrors);
             $finder = new \DOMXPath($dom);
             $class = "block-book-title";
             $query = sprintf("//*[contains(@class, '%s')]", $class);
             $nodes = $finder->query($query);
+            //$nodes = $dom->getElementsByTagName('div');
             foreach ($nodes as $node) {
-                //$this->out($node->nodeValue);
-                //echo $node->nodeValue. "<br>";
+//                $this->out($node->nodeValue . PHP_EOL);
+                echo $node->nodeValue . "<br>";
             }
-            echo $pageOfGenre;
-        //}
+            libxml_use_internal_errors($internalErrors);
+        }
+     * 
+     */
+        $url = 'https://www.livelib.ru/genre/Зарубежные-детективы';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_exec($ch);
+        curl_close($ch);
     }
 
     /**

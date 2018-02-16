@@ -39,18 +39,18 @@ class BooksOfGenres extends Shell {
             $id = 1;
             $genre = $this->Genres->findById($id)->firstOrFail();
             $pageOfGenre = $genre['link_livelib'];
-            $dom = new \DOMDocument('1.0', 'UTF-8');
-            $internalErrors = libxml_use_internal_errors(true);
+            $dom = new \DOMDocument();
+   //         $internalErrors = libxml_use_internal_errors(true);
             $dom->loadHTMLFile($pageOfGenre);
-            $finder = new \DOMXPath($dom);
-            $class = "block-book-title";
-            $query = sprintf("//*[contains(@class, '%s')]", $class);
-            $nodes = $finder->query($query);
-            //$nodes = $dom->getElementsByTagName('a');
+            //$finder = new \DOMXPath($dom);
+            //$class = "block-book-title";
+           // $query = sprintf("//*[contains(@class, '%s')]", $class);
+            //$nodes = $finder->query($query);
+            $nodes = $dom->getElementsByTagName('div');
             foreach ($nodes as $node) {
                 $this->out($node->nodeValue . PHP_EOL);
             }
-            libxml_use_internal_errors($internalErrors);
-       // }
+            //libxml_use_internal_errors($internalErrors);
+        //}
     }
 }
