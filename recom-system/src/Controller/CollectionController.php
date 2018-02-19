@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Controller\AppController;
@@ -9,47 +10,43 @@ use App\Controller\AppController;
  *
  * @method \App\Model\Entity\Collection[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
-class CollectionController extends AppController
-{
+class CollectionController extends AppController {
 
     public function initialize() {
         parent::initialize();
         $this->loadModel('Genres');
     }
+
     /**
      * Index method
      *
      * @return \Cake\Http\Response|void
      */
-    public function index()
-    {
-    /*    $total = $this->Genres->find()->count();
+    public function index() {
+        $id = 1;
 
-        for ($id = 1; $id < $total; $id++) {
+        $genre = $this->Genres->findById($id)->firstOrFail();
+        $pageOfGenre = $genre['link_livelib'];
+        $dom = new \DOMDocument("1.0", "UTF-8");
+        $internalErrors = libxml_use_internal_errors(true);
+        $dom->loadHTMLFile($pageOfGenre);
 
-            $genre = $this->Genres->findById($id)->firstOrFail();
-            $pageOfGenre = $genre['link_livelib'];
-            $dom = new \DOMDocument("1.0", "UTF-8");
-            $internalErrors = libxml_use_internal_errors(true);
-            $dom->loadHTMLFile($pageOfGenre);
-            $finder = new \DOMXPath($dom);
-            $class = "block-book-title";
-            $query = sprintf("//*[contains(@class, '%s')]", $class);
-            $nodes = $finder->query($query);
-            //$nodes = $dom->getElementsByTagName('div');
-            foreach ($nodes as $node) {
-//                $this->out($node->nodeValue . PHP_EOL);
-                echo $node->nodeValue . "<br>";
-            }
-            libxml_use_internal_errors($internalErrors);
+        $finder = new \DOMXPath($dom);
+        $bookName = "block-book-title";
+        $bookISBN = "book-details-info";
+        $query1 = sprintf("//a[contains(@class, '%s')]", $bookName);
+        $query2 = sprintf("//*[contains(@class, '%s')]", $bookISBN);
+        $books = $finder->query($query1);
+        $infos = $finder->query($query2);
+        for ($id = 0; $id < 25; $id++) {
+            echo $books[$id]->nodeValue ."<br>";
+            echo $books[$id]->getAttribute('href') . "<br>";
+            $isbn = $infos[$id]->nodeValue;
+            $afterisbn = stristr($isbn, 'ISBN: ');
+            $keywords = preg_split("/[\s,]+/", $afterisbn);
+            echo "ISBN: " . $keywords[1] . "<br>";
         }
-     * 
-     */
-        $url = 'https://www.livelib.ru/genre/Зарубежные-детективы';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_exec($ch);
-        curl_close($ch);
+        libxml_use_internal_errors($internalErrors);
     }
 
     /**
@@ -59,8 +56,7 @@ class CollectionController extends AppController
      * @return \Cake\Http\Response|void
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
-    {
+    public function view($id = null) {
         $collection = $this->Collection->get($id, [
             'contain' => []
         ]);
@@ -73,8 +69,7 @@ class CollectionController extends AppController
      *
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
-    public function add()
-    {
+    public function add() {
         $collection = $this->Collection->newEntity();
         if ($this->request->is('post')) {
             $collection = $this->Collection->patchEntity($collection, $this->request->getData());
@@ -95,8 +90,7 @@ class CollectionController extends AppController
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Network\Exception\NotFoundException When record not found.
      */
-    public function edit($id = null)
-    {
+    public function edit($id = null) {
         $collection = $this->Collection->get($id, [
             'contain' => []
         ]);
@@ -119,8 +113,7 @@ class CollectionController extends AppController
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
-    {
+    public function delete($id = null) {
         $this->request->allowMethod(['post', 'delete']);
         $collection = $this->Collection->get($id);
         if ($this->Collection->delete($collection)) {
@@ -131,4 +124,5 @@ class CollectionController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
 }
