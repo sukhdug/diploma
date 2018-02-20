@@ -27,10 +27,14 @@ class BooksTableTest extends TestCase
         'app.books',
         'app.quotes',
         'app.liked_books',
+        'app.users',
+        'app.telegrams',
         'app.notification_books',
-        'app.read_books',
+        'app.reviews',
+        'app.readers',
         'app.recommended_books',
-        'app.reviews'
+        'app.notifications',
+        'app.read_books'
     ];
 
     /**

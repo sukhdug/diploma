@@ -84,4 +84,12 @@ class CollectionBooksTable extends Table {
         return $foundisbn;
     }
 
+    public function changeBookStatus($book) {
+        $book->status = 'added';
+        if ($this->save($book)) {
+            return true;
+        }
+        return false;
+    }
+
 }
