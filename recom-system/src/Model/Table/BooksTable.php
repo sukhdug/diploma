@@ -172,7 +172,7 @@ class BooksTable extends Table {
         return false;
     }
 
-    public function checkISBN($isbn) {
+    public function getBookByISBN($isbn) {
         $foundisbn = $this->find('all')->where(['isbn' => $isbn])->first();
         return $foundisbn;
     }

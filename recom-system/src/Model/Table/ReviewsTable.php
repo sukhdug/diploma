@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model\Table;
 
 use Cake\ORM\Query;
@@ -22,8 +23,7 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\Review[] patchEntities($entities, array $data, array $options = [])
  * @method \App\Model\Entity\Review findOrCreate($search, callable $callback = null, $options = [])
  */
-class ReviewsTable extends Table
-{
+class ReviewsTable extends Table {
 
     /**
      * Initialize method
@@ -31,8 +31,7 @@ class ReviewsTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
-    {
+    public function initialize(array $config) {
         parent::initialize($config);
 
         $this->setTable('reviews');
@@ -61,16 +60,15 @@ class ReviewsTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
-    {
+    public function validationDefault(Validator $validator) {
         $validator
-            ->integer('id')
-            ->allowEmpty('id', 'create');
+                ->integer('id')
+                ->allowEmpty('id', 'create');
 
         $validator
-            ->scalar('rate')
-            ->maxLength('rate', 10)
-            ->allowEmpty('rate');
+                ->scalar('rate')
+                ->maxLength('rate', 10)
+                ->allowEmpty('rate');
 
         return $validator;
     }
@@ -82,11 +80,29 @@ class ReviewsTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
-    {
+    public function buildRules(RulesChecker $rules) {
         $rules->add($rules->existsIn(['book_id'], 'Books'));
         $rules->add($rules->existsIn(['reader_id'], 'Readers'));
 
         return $rules;
+    }
+
+    public function addReview($addReview) {
+        $review = $this->newEntity();
+        $review->book_id = $addReview['book_id'];
+        $review->reader_id = $addReview['reader_id'];
+        $review->rate = $addReview['rate'];
+        if ($this->save($review)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getReview($book_id, $reader_id) {
+        $review = $this->find('all')
+                ->where(['book_id' => $book_id])
+                ->where(['reader_id' => $reader_id])
+                ->first();
+        return $review;
     }
 }

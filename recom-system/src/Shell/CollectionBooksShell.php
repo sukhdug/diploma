@@ -35,12 +35,12 @@ class CollectionBooksShell extends Shell {
      * @return bool|int|null Success or error code.
      */
     public function main() {
-        //$this->collectionBooksByGenres();
-        $this->addCollectionBook();
+        $this->collectionBooksByGenres();
+        //$this->addCollectionBook();
     }
 
     public function collectionBooksByGenres() {
-        $id = 5;
+        $id = 14;
         $livelib = LIVELIB;
         $genre = $this->Genres->find('all')->where(['id' => $id])->first();
 
@@ -59,7 +59,7 @@ class CollectionBooksShell extends Shell {
             $query2 = sprintf("//*[contains(@class, '%s')]", $bookISBN);
             $books = $finder->query($query1);
             $infos = $finder->query($query2);
-            for ($id = 0; $id < 25; $id++) {
+            for ($id = 0; $id < $books->length; $id++) {
                 $isbn = $infos[$id]->nodeValue;
                 $afterisbn = stristr($isbn, 'ISBN: ');
                 if (!empty($afterisbn)) {
@@ -89,7 +89,7 @@ class CollectionBooksShell extends Shell {
     }
 
     public function addCollectionBook() {
-        $id = 25;
+        $id = 150;
         $addBook = array();
         $book = $this->CollectionBooks->find('all')->where(['id' => $id])->first();
 
@@ -146,7 +146,7 @@ class CollectionBooksShell extends Shell {
                 /* Конец создания массива */
 
                 if ($addBook['reviews_count'] > 1) {
-                    $checkisbn = $this->Books->checkISBN($addBook['isbn']);
+                    $checkisbn = $this->Books->getBookByISBN($addBook['isbn']);
                     if (!empty($checkisbn)) {
                         $this->out("Книга уже добавлена в БД");
                     } else {
