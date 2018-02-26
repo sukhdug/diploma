@@ -102,7 +102,7 @@ class CollectionReviewsShell extends Shell {
                     if ((!empty($user)) && (!empty($book))) {
                         $this->out($readers[$id]->nodeValue . " читатель добавлен в БД. Его оценка: " . $rates[$id]->nodeValue);
                         $this->out($book['id'] . " книга добавлена");
-                        $review = $this->Reviews->getReview($book['id'], $user['id']);
+                        $review = $this->Reviews->getReviewByBookAndReaderId($book['id'], $user['id']);
                         if (!empty($review)) {
                             $this->out("Рецензия добавлена");
                         } else {
@@ -124,5 +124,7 @@ class CollectionReviewsShell extends Shell {
             }
         }
     }
+
+    public function addCollectionReader() {}
 
 }

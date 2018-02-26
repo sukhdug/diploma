@@ -98,7 +98,7 @@ class ReviewsTable extends Table {
         return false;
     }
 
-    public function getReview($book_id, $reader_id) {
+    public function getReviewByBookAndReaderId($book_id, $reader_id) {
         $review = $this->find('all')
                 ->where(['book_id' => $book_id])
                 ->where(['reader_id' => $reader_id])
