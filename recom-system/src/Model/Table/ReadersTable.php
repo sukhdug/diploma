@@ -100,6 +100,18 @@ class ReadersTable extends Table {
         return $rules;
     }
 
+    public function addReader($addReader) {
+        $reader = $this->newEntity();
+        $reader->username = $addReader['username'];
+        $reader->fromsite = $addReader['fromsite'];
+        $reader->reviews_count = $addReader['reviews_count'];
+        $reader->link = $addReader['link'];
+        if ($this->save($reader)) {
+            return true;
+        }
+        return false;
+    }
+
     public function getReaderByUsername($username) {
         $reader = $this->find('all')->where(['username' => $username])->first();
         return $reader;

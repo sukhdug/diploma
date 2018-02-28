@@ -39,7 +39,8 @@ class CollectionReviewsShell extends Shell {
      */
     public function main() {
         //$this->collectionReviewsByBooks();
-        $this->addCollectionReview();
+        //$this->addCollectionReview();
+        $this->addReader('Nickanorra');
     }
 
     public function collectionReviewsByBooks() {
@@ -114,8 +115,9 @@ class CollectionReviewsShell extends Shell {
                             $this->out($status);
                         }
                     } else {
+                        $addReader = $readers[$id]->nodeValue;
+                        $this->out($addReader . " читателя нет в БД. Его оценка: " . $rates[$id]->nodeValue);
 
-                        $this->out($readers[$id]->nodeValue . " читателя нет в БД. Его оценка: " . $rates[$id]->nodeValue);
                     }
                 }
                 libxml_use_internal_errors($internalErrors);
@@ -125,6 +127,23 @@ class CollectionReviewsShell extends Shell {
         }
     }
 
-    public function addCollectionReader() {}
-
+    public function addReader($reader) {
+        $pageOfReader = 'https://www.livelib.ru/reader/' . $reader;
+        $dom = new \DOMDocument("1.0", "UTF-8");
+        $internalErrors = libxml_use_internal_errors(true);
+        $dom->loadHTMLFile($pageOfReader);
+        $finder = new \DOMXPath($dom);
+        $value = "standard";
+        $counts = $finder->query(sprintf("//li[contains(@class, '%s')]", $value));
+        foreach($counts as $count) {
+            $review = $count->nodeValue;
+            $result = strripos($review, 'Рецензии ');
+            if($result !== false) {
+                $matches = [];
+                preg_match('/([0-9]+)/', $review, $matches);
+                $this->out($matches);
+            }
+        }
+        libxml_use_internal_errors($internalErrors);
+    }
 }
