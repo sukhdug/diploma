@@ -92,4 +92,12 @@ class CollectionBooksTable extends Table {
         return false;
     }
 
+    public function changeBookStatusError($book) {
+        $book->status = 'error';
+        if ($this->save($book)) {
+            return true;
+        }
+        return false;
+    }
+
 }

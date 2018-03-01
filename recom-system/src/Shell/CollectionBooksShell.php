@@ -35,8 +35,10 @@ class CollectionBooksShell extends Shell {
      * @return bool|int|null Success or error code.
      */
     public function main() {
-        $this->collectionBooksByGenres();
-        //$this->addCollectionBook();
+        //$this->collectionBooksByGenres();
+        for ($id = 1; $id <= 100; $id++){
+            $this->addCollectionBook($id);
+        }
     }
 
     public function collectionBooksByGenres() {
@@ -88,8 +90,8 @@ class CollectionBooksShell extends Shell {
         }
     }
 
-    public function addCollectionBook() {
-        $id = 150;
+    public function addCollectionBook($id) {
+       // $id = 150;
         $addBook = array();
         $book = $this->CollectionBooks->find('all')->where(['id' => $id])->first();
 
@@ -119,10 +121,23 @@ class CollectionBooksShell extends Shell {
                 $genres = $finder->query(sprintf("//a[contains(@class, '%s')]", $genres));
                 $description = $finder->query(sprintf("//p[contains(@itemprop, '%s')]", $description));
                 $rating = $finder->query(sprintf("//span[contains(@itemprop, '%s')]", $rating));
-                $reviewCount = $count->item(0)->nodeValue;
-                $count = stristr($reviewCount, ' ');
-                $count = $count;
-                $count = trim($count);
+                $reviewCount = 0;
+                foreach ($count as $c) {
+                    $recent = $c->nodeValue;
+                    $result = strripos($recent, 'Рецензии');
+                    if ($result !== false) {
+                        $matches = [];
+                        preg_match('/([0-9]+)/', $recent, $matches);
+                        if (isset($matches) && !empty($matches)) {
+                            $reviewCount = $matches[0];
+                            $this->out($reviewCount);
+                            break;
+                        } else {
+                            $this->out('Нет рецензий');
+                        }
+                    }
+                }
+                $count = $reviewCount;
                 $cover = $cover->item(0)->getAttribute('src');
 
                 /* Собранные данные храним в массив, чтобы в дальнейшем сохранить в базу */
@@ -144,7 +159,6 @@ class CollectionBooksShell extends Shell {
                 $addBook['description'] = trim($addBook['description']);
                 $addBook['fromsite'] = 'livelib';
                 /* Конец создания массива */
-
                 if ($addBook['reviews_count'] > 1) {
                     $checkisbn = $this->Books->getBookByISBN($addBook['isbn']);
                     if (!empty($checkisbn)) {
@@ -160,12 +174,15 @@ class CollectionBooksShell extends Shell {
                     }
                 } else {
                     $this->out("Книге оставлены очень мало рецензий");
+                    $error = $this->CollectionBooks->changeBookStatusError($book);
                 }
                 libxml_use_internal_errors($internalErrors);
-            } else {
+            } elseif ($book['status'] == 'error') {
+                $this->out("Книга с ошибкой");
+
+            } elseif ($book['status'] == 'added') {
                 $this->out("Книга уже добавлена в БД");
             }
         }
     }
-
 }

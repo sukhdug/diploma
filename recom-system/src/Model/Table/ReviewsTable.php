@@ -105,4 +105,11 @@ class ReviewsTable extends Table {
                 ->first();
         return $review;
     }
+
+    public function getReviewByBookId($book_id) {
+        $review = $this->find('all')
+                ->where(['book_id' => $book_id])
+                ->first();
+        return $review;
+    }
 }

@@ -38,14 +38,14 @@ class CollectionReviewsShell extends Shell {
      * @return bool|int|null Success or error code.
      */
     public function main() {
-        //$this->collectionReviewsByBooks();
-        //$this->addCollectionReview();
-        $this->addReader('Nickanorra');
+
+        //    $this->collectionReviewsByBooks($id);
+        $this->addCollectionReview(3);
+        //$this->changeStatusCollectionReviews(2334);
     }
 
-    public function collectionReviewsByBooks() {
+    public function collectionReviewsByBooks($id) {
 
-        $id = 1;
         $book = $this->Books->find('all')->where(['id' => $id])->first();
         $link = 'https://www.livelib.ru/book/';
         $review = [];
@@ -76,8 +76,8 @@ class CollectionReviewsShell extends Shell {
         }
     }
 
-    public function addCollectionReview() {
-        $id = 1;
+    public function addCollectionReview($id) {
+
         $book_review = $this->CollectionReviews->find('all')->where(['id' => $id])->first();
         $book = $this->Books->getBookByISBN($book_review['isbn']);
         $review = [];
@@ -115,9 +115,22 @@ class CollectionReviewsShell extends Shell {
                             $this->out($status);
                         }
                     } else {
-                        $addReader = $readers[$id]->nodeValue;
-                        $this->out($addReader . " читателя нет в БД. Его оценка: " . $rates[$id]->nodeValue);
-
+                        $reader_username = $readers[$id]->nodeValue;
+                        $status = $this->addReader($reader_username);
+                        if ($status) {
+                            $review_exist = $this->Reviews->getReviewByBookAndReaderId($book['id'], $user['id']);
+                            if (!empty($review_exist)) {
+                                $this->out("Рецензия добавлена");
+                            } else {
+                                $review['book_id'] = $book['id'];
+                                $review['reader_id'] = $user['id'];
+                                $review['rate'] = $rates[$id]->nodeValue;
+                                $review_adding_status = $this->Reviews->addReview($review);
+                                $this->out($review_adding_status);
+                            }
+                        } else {
+                            continue;
+                        }
                     }
                 }
                 libxml_use_internal_errors($internalErrors);
@@ -127,23 +140,66 @@ class CollectionReviewsShell extends Shell {
         }
     }
 
-    public function addReader($reader) {
-        $pageOfReader = 'https://www.livelib.ru/reader/' . $reader;
+    public function addReader($reader_username) {
+        $pageOfReader = 'https://www.livelib.ru/reader/' . $reader_username;
         $dom = new \DOMDocument("1.0", "UTF-8");
         $internalErrors = libxml_use_internal_errors(true);
         $dom->loadHTMLFile($pageOfReader);
         $finder = new \DOMXPath($dom);
+        $reader = [];
+        $reader['username'] = $reader_username;
+        $reader['link'] = $pageOfReader;
         $value = "standard";
         $counts = $finder->query(sprintf("//li[contains(@class, '%s')]", $value));
         foreach($counts as $count) {
             $review = $count->nodeValue;
-            $result = strripos($review, 'Рецензии ');
+            $result = strripos($review, 'Рецензии');
             if($result !== false) {
                 $matches = [];
                 preg_match('/([0-9]+)/', $review, $matches);
-                $this->out($matches);
+                $reader['reviews_count'] = $matches[0];
+                $reader['fromsite'] = 'livelib';
+                if($reader['reviews_count'] >= 5){
+                    $username = $this->Readers->getReaderByUsername($reader['username']);
+                    if(!empty($username)) {
+                        $this->out('Читатель уже есть в БД');
+                        return true;
+                    } else {
+                        $this->out('Читателя нет в БД');
+                        $add = $this->Readers->addReader($reader);
+                        if($add) {
+                            $this->out('Читатель добавлен');
+                            return true;
+                        } else {
+                            $this->out('Неизвестная ошибка');
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+                break;
             }
         }
         libxml_use_internal_errors($internalErrors);
+    }
+
+    public function changeStatusCollectionReviews($id) {
+
+        $book_review = $this->CollectionReviews->find('all')->where(['id' => $id])->first();
+        if (empty($book_review)) {
+            $this->out('Запись не найдена');
+        } else {
+            if ($book_review['status'] == 'new') {
+                $isbn = $book_review['isbn'];
+                $book = $this->Books->getBookByISBN($isbn);
+                if (!empty($book)) {
+                    $review = $this->Reviews->getReviewByBookId($book['id']);
+                    if (!empty($review)) {
+                        $this->CollectionReviews->changeBookStatus($book_review);
+                    }
+                }
+            }
+        }
     }
 }

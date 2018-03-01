@@ -97,4 +97,12 @@ class CollectionReviewsTable extends Table {
         return false;
     }
 
+    public function changeBookStatus($book) {
+        $book->status = 'added';
+        if ($this->save($book)) {
+            return true;
+        }
+        return false;
+    }
+
 }
