@@ -39,8 +39,10 @@ class CollectionReviewsShell extends Shell {
      */
     public function main() {
 
-        //    $this->collectionReviewsByBooks($id);
-        $this->addCollectionReview(3);
+        for ($id = 1; $id < 50; $id++){
+            //$this->collectionReviewsByBooks($id);
+             $this->addCollectionReview($id);
+        }
         //$this->changeStatusCollectionReviews(2334);
     }
 

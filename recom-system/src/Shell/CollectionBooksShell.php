@@ -35,14 +35,16 @@ class CollectionBooksShell extends Shell {
      * @return bool|int|null Success or error code.
      */
     public function main() {
-        //$this->collectionBooksByGenres();
-        for ($id = 1; $id <= 100; $id++){
-            $this->addCollectionBook($id);
-        }
+        //for ($id = 400; $id <= 450; $id++){
+            //$this->collectionBooksByGenres(17);
+            $this->addCollectionBook(707);
+            $this->addCollectionBook(708);
+            $this->addCollectionBook(709);
+        //}
     }
 
-    public function collectionBooksByGenres() {
-        $id = 14;
+    public function collectionBooksByGenres($id) {
+       // $id = 14;
         $livelib = LIVELIB;
         $genre = $this->Genres->find('all')->where(['id' => $id])->first();
 
@@ -50,6 +52,8 @@ class CollectionBooksShell extends Shell {
             $this->out('Запись не найдена');
         } else {
             $pageOfGenre = $genre['link_livelib'];
+            $pageOfGenre .= '/~3';
+            $this->out($pageOfGenre);
             $dom = new \DOMDocument("1.0", "UTF-8");
             $internalErrors = libxml_use_internal_errors(true);
             $dom->loadHTMLFile($pageOfGenre);
@@ -113,7 +117,7 @@ class CollectionBooksShell extends Shell {
                 $genres = "label-genre";
                 $description = "description";
                 $rating = "ratingValue";
-                $name = $finder->query(sprintf("//*[contains(@itemprop, '%s')]", $bookTitle));
+                $name = $finder->query(sprintf("//span[contains(@itemprop, '%s')]", $bookTitle));
                 $count = $finder->query(sprintf("//a[contains(@class, '%s')]", $reviewCount));
                 $author = $finder->query(sprintf("//a[contains(@id, '%s')]", $bookAuthor));
                 $cover = $finder->query(sprintf("//img[contains(@id, '%s')]", $bookCover));
@@ -121,7 +125,7 @@ class CollectionBooksShell extends Shell {
                 $genres = $finder->query(sprintf("//a[contains(@class, '%s')]", $genres));
                 $description = $finder->query(sprintf("//p[contains(@itemprop, '%s')]", $description));
                 $rating = $finder->query(sprintf("//span[contains(@itemprop, '%s')]", $rating));
-                $reviewCount = 0;
+                $addBook['reviews_count'] = '';
                 foreach ($count as $c) {
                     $recent = $c->nodeValue;
                     $result = strripos($recent, 'Рецензии');
@@ -129,28 +133,67 @@ class CollectionBooksShell extends Shell {
                         $matches = [];
                         preg_match('/([0-9]+)/', $recent, $matches);
                         if (isset($matches) && !empty($matches)) {
-                            $reviewCount = $matches[0];
-                            $this->out($reviewCount);
+                            $addBook['reviews_count'] = $matches[0];
                             break;
                         } else {
+                            $addBook['reviews_count'] = 0;
                             $this->out('Нет рецензий');
+                            break;
                         }
                     }
                 }
-                $count = $reviewCount;
-                $cover = $cover->item(0)->getAttribute('src');
-
+                $this->out($addBook['reviews_count']);
+                $picture = 'no';
+                foreach ($cover as $c) {
+                    $picture = $c->getAttribute('src');
+                    if($picture != 'no') {
+                        break;
+                    }
+                }
+                $title = 'no';
+                foreach ($name as $n) {
+                    $title = $n->nodeValue;
+                    if($title != 'no') {
+                        break;
+                    }
+                }
+                $writer = 'no';
+                foreach ($author as $a) {
+                    $writer = $a->nodeValue;
+                    if($writer != 'no') {
+                        break;
+                    }
+                }
+                $book_isbn = 'no';
+                foreach ($isbn as $i) {
+                    $book_isbn = $i->nodeValue;
+                    if($book_isbn != 'no') {
+                        break;
+                    }
+                }
+                $book_description = 'no';
+                foreach ($description as $d) {
+                    $book_description = $d->nodeValue;
+                    if($book_description != 'no') {
+                        break;
+                    }
+                }
+                $book_rating = 'no';
+                foreach ($rating as $r) {
+                    $book_rating = $r->nodeValue;
+                    if($book_rating != 'no') {
+                        break;
+                    }
+                }
                 /* Собранные данные храним в массив, чтобы в дальнейшем сохранить в базу */
-                $addBook['name'] = $name->item(0)->nodeValue;
-                $addBook['authors'] = $author->item(0)->nodeValue;
-                $addBook['cover'] = $cover;
+                $addBook['name'] = $title;
+                $addBook['authors'] = $writer;
+                $addBook['cover'] = $picture;
                 $addBook['genres'] = '';
-                $addBook['reviews_count'] = $count;
-                $addBook['isbn'] = $isbn->item(0)->nodeValue;
-                $addBook['description'] = $description->item(0)->nodeValue;
-                $addBook['rating'] = $rating->item(0)->nodeValue;
-                if (empty($addBook['reviews_count']))
-                    $addBook['reviews_count'] = 0;
+                //$addBook['reviews_count'] = $reviewCount;
+                $addBook['isbn'] = $book_isbn;
+                $addBook['description'] = $book_description;
+                $addBook['rating'] = $book_rating;
                 $addBook['link'] = $book['link'];
                 foreach ($genres as $genre) {
                     $addBook['genres'] .= $genre->nodeValue . ", ";
