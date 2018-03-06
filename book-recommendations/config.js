@@ -1,17 +1,18 @@
-const mysql = require('mysql');
+var mysql = require('mysql');
 
 // Including database
-var connection = mysql.createConnection({
+var db = mysql.createConnection({
   host     : 'localhost',
   user     : 'diploma',
   password : 'diploma',
   database : 'diploma'
 });
- 
-connection.connect();
-var id = 122;
-var query = "SELECT * FROM books where id = " + mysql.escape(id);
-connection.query(query, function(error, result, fields){
-    console.log(result);
-});
-connection.end();
+
+exports.database = function (query) {
+  db.connect();
+  var id = 100;
+  db.query(query, function(error, result, fields) {
+      console.log(result);
+  });
+  db.end();
+};

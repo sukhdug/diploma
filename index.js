@@ -1,22 +1,22 @@
-const TelegramBot = require('node-telegram-bot-api');
+var TelegramBot = require('node-telegram-bot-api');
 
 // Токен телеграм-бота
-const token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30';
+var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30';
 
 // Включить опрос сервера
-const bot = new TelegramBot(token, {polling: true});
+var bot = new TelegramBot(token, {polling: true});
 
 bot.onText(/\/help (.+)/, (msg, match) =>  {
 
-  const chatId = msg.chat.id;
-  const resp = match[1];
+  var chatId = msg.chat.id;
+  var resp = match[1];
 
   bot.sendMessage(chatId, resp);
 });
 
 bot.on('message', (msg) => {
-    const chatId = msg.chat.id;
-    const user = msg.chat.username;
+    var chatId = msg.chat.id;
+    var user = msg.chat.username;
     var hi = 'hi';
     if (msg.text.toString().toLowerCase().indexOf('hi') === 0) {
         bot.sendMessage(chatId, "Hello " + user + "!");
