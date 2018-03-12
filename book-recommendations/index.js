@@ -1,8 +1,37 @@
-var book = require('./Book');
+var TelegramBot = require('node-telegram-bot-api');
+var sequelize = require('./sequelize');
 
-book.name = 'Три товарища';
-book.isbn = '978-5-17-090411-2';
-book.authors = 'Эрих Мария Ремарк';
-book.genres = 'Немецкая классика';
-book.description = 'Книга Эриха Марии Ремарка';
-book.sayHello;
+function book (callback) {
+  sequelize.getBooks(15, (books) => {
+	callback(books);
+  });
+}
+book((books) => {
+	console.log(books);
+})
+// Токен телеграм-бота
+var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30';
+
+// Включить опрос сервера
+var bot = new TelegramBot(token, {polling: true});
+
+bot.onText(/\/help (.+)/, (msg, match) =>  {
+
+  var chatId = msg.chat.id;
+  var resp = match[1];
+
+  bot.sendMessage(chatId, resp);
+});
+
+bot.on('message', (msg) => {
+    var chatId = msg.chat.id;
+    var user = msg.chat.username;
+    var hi = 'hi';
+    if (msg.text.toString().toLowerCase().indexOf('hi') === 0) {
+        bot.sendMessage(chatId, "Hello " + user + "!");
+    } else if (msg.text.toString().indexOf('how are you?') === 0) {
+        bot.sendMessage(chatId, "I'm fine, and you?");
+    } else {
+        bot.sendMessage(chatId, "I don't understand you, " + user + "! Sorry");
+    }
+});
