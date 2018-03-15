@@ -37,12 +37,9 @@ class CollectionBooksShell extends Shell {
     public function main() {
         //for ($id = 400; $id <= 450; $id++){
             //$this->collectionBooksByGenres(17);
-            $this->addCollectionBook(873);
-            $this->addCollectionBook(874);
-            $this->addCollectionBook(875);
-            $this->addCollectionBook(870);
-            $this->addCollectionBook(871);
-            $this->addCollectionBook(872);
+            $this->addCollectionBook(903);
+            $this->addCollectionBook(904);
+            $this->addCollectionBook(905);
         //}
     }
 
