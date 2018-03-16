@@ -54,7 +54,3 @@ exports.getBooks = function(id, callback) {
 		callback(books);
 	});
 };
-
-//getBooks( (books) => {
-//	console.log(books);
-//});
