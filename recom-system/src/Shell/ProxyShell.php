@@ -30,7 +30,7 @@ class ProxyShell extends Shell
      */
     public function main()
     {
-        $url = 'http://livelib.ru/ip.php';
+        $url = 'http://livelib.ru/ip';
         $proxy = '113.161.68.146:8080';
         //$proxyauth = 'user:password';
 

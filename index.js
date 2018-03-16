@@ -1,5 +1,14 @@
 var TelegramBot = require('node-telegram-bot-api');
+var sequelize = require('./config/sequelize');
 
+function book (callback) {
+  sequelize.getBooks(15, (books) => {
+  callback(books);
+  });
+}
+book((books) => {
+  console.log(books);
+})
 // Токен телеграм-бота
 var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30';
 
