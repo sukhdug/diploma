@@ -87,7 +87,7 @@ CREATE TABLE `bot_commands` (
   `command` varchar(255) NOT NULL,
   `description` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -96,6 +96,7 @@ CREATE TABLE `bot_commands` (
 
 LOCK TABLES `bot_commands` WRITE;
 /*!40000 ALTER TABLE `bot_commands` DISABLE KEYS */;
+INSERT INTO `bot_commands` VALUES (1,'start','Приветствие при запуске бота'),(2,'help','Описание команд и руководство по использованию'),(3,'рекомендация','Показывать рекомендуемую книгу системы'),(4,'уведомления','Показывать информацию о подписке на уведомления'),(5,'читал','введите эту команду, чтобы посмотреть прочитанные вами книги'),(6,'нравится','введите эту команду, чтобы посмотреть понравившиеся книги вам'),(7,'справка','описание команд и руководство по использованию');
 /*!40000 ALTER TABLE `bot_commands` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -447,4 +448,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-16 18:06:40
+-- Dump completed on 2018-03-16 18:54:15
