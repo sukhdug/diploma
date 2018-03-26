@@ -49,8 +49,9 @@ const Book = sequelize.define('books', {
 	timestamps: false
 });
 
-exports.getBooks = function(id, callback) {
-	Book.findAll({where: {id: id}}).then(books => {
-		callback(books);
+exports.getBook = function(id, callback) {
+	Book.findOne({where: {id: id}}).then(book => {
+    //console.log(book.name);
+		callback(book.name);
 	});
 };
