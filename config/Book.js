@@ -1,52 +1,73 @@
-class Book {
-  constructor() {
-	  this.id = 1;
-  }
-  set name(name) {
-	  this._name = name;
-  }
-  set authors(authors) {
-	  this._authors = authors;
-  }
-  set genres(genres) {
-	  this._genres = genres;
-  }
-  set description(description) {
-	  this._description = description;
-  }
-  set isbn(isbn) {
-	  this._isbn = isbn;
-  }
-  get name() {
-	  return this._name;
-  }
-  get authors() {
-	  return this._authors;
-  }
-  get genres() {
-	  return this._genres;
-  }
-  get description() {
-	  return this._description;
-  }
-  get isbn() {
-	  return this._isbn;
-  }
+const Sequelize = require('sequelize');
 
-  sayHello() {
-	  console.log('Название книги: ' + this.name);
-	  console.log('ISBN книги: ' + this.isbn);
-	  console.log('Автор книги: ' + this.authors);
-	  console.log('Жанры книги: ' + this.genres);
-	  console.log('Описание книги: ' + this.description);
-	  console.log('ID книги: ' + this.id);
-  }
-}
+const sequelize = new Sequelize('mysql://diploma:diploma@localhost:3306/diploma');
 
-var book = new Book();
-book.name = 'Три товарища';
-book.isbn = '978-5-17-090411-2';
-book.authors = 'Эрих Мария Ремарк';
-book.genres = 'Немецкая классика';
-book.description = 'Книга Эриха Марии Ремарка';
-book.sayHello();
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
+
+const Book = sequelize.define('books', {
+  name: {
+    type: Sequelize.STRING
+  },
+  authors: {
+    type: Sequelize.STRING
+  },
+  cover: {
+    type: Sequelize.STRING
+  },
+  genres: {
+    type: Sequelize.STRING
+  },
+  isbn: {
+    type: Sequelize.STRING
+  },
+  rating: {
+    type: Sequelize.STRING
+  },
+  description: {
+    type: Sequelize.STRING
+  },
+  link: {
+    type: Sequelize.STRING
+  },
+  fromsite: {
+    type: Sequelize.STRING
+  },
+  reviews_count: {
+    type: Sequelize.INTEGER
+  },
+  quote_id: {
+    type: Sequelize.INTEGER
+  }
+}, {
+  timestamps: false
+});
+
+exports.getBook = function(id, callback) {
+  Book.findOne({where: {id: id}}).then(book => {
+    //console.log(book.name);
+    callback(book.name);
+  });
+};
+
+exports.getRandomBook = function(id, callback) {
+  Book.findOne({where: {id: id}}).then(book => {
+    //console.log(book.name);
+    var bookData = [];
+    bookData.push(book.name);
+    bookData.push(book.authors);
+    bookData.push(book.genres);
+    bookData.push(book.isbn);
+    bookData.push(book.rating);
+    bookData.push(book.description);
+    bookData.push(book.link);
+    bookData.push(book.cover);
+    callback(bookData);
+  });
+};
