@@ -11,39 +11,21 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-const Book = sequelize.define('books', {
-  name: {
-    type: Sequelize.STRING
-  },
-  authors: {
-    type: Sequelize.STRING
-  },
-  cover: {
-    type: Sequelize.STRING
-  },
-  genres: {
-    type: Sequelize.STRING
-  },
-  isbn: {
-    type: Sequelize.STRING
-  },
-  rating: {
-    type: Sequelize.STRING
-  },
-  description: {
-    type: Sequelize.STRING
-  },
-  link: {
-    type: Sequelize.STRING
-  },
-  fromsite: {
-    type: Sequelize.STRING
-  },
-  reviews_count: {
+const Book = sequelize.define('recommended_books', {
+  book_id: {
     type: Sequelize.INTEGER
   },
-  quote_id: {
+  reader_id: {
     type: Sequelize.INTEGER
+  },
+  review_id: {
+    type: Sequelize.INTEGER
+  },
+  user_id: {
+    type: Sequelize.INTEGER
+  },
+  user_choose: {
+    type: Sequelize.STRING
   }
 }, {
   timestamps: false
@@ -69,11 +51,5 @@ exports.getRandomBook = function(id, callback) {
     bookData.push(book.link);
     bookData.push(book.cover);
     callback(bookData);
-  });
-};
-
-exports.getCountOfBooks = function(callback) {
-  Book.count().then(count => {
-    callback(count);
   });
 };
