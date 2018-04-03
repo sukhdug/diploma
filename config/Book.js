@@ -51,23 +51,24 @@ const Book = sequelize.define('books', {
 
 exports.getBook = function(id, callback) {
   Book.findOne({where: {id: id}}).then(book => {
-    //console.log(book.name);
     callback(book.name);
   });
 };
 
 exports.getRandomBook = function(id, callback) {
   Book.findOne({where: {id: id}}).then(book => {
-    //console.log(book.name);
-    var bookData = [];
-    bookData.push(book.name);
-    bookData.push(book.authors);
-    bookData.push(book.genres);
-    bookData.push(book.isbn);
-    bookData.push(book.rating);
-    bookData.push(book.description);
-    bookData.push(book.link);
-    bookData.push(book.cover);
+
+    var bookData = {
+      id: book.id,
+      name: book.name,
+      authors: book.authors,
+      genres: book.genres,
+      isbn: book.isbn,
+      rating: book.rating,
+      description: book.description,
+      link: book.link,
+      cover: book.cover
+    }
     callback(bookData);
   });
 };
