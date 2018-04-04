@@ -49,6 +49,8 @@ const Book = sequelize.define('books', {
   timestamps: false
 });
 
+exports.Book = Book;
+
 exports.getBook = function(id, callback) {
   Book.findOne({where: {id: id}}).then(book => {
     callback(book.name);
@@ -73,7 +75,7 @@ exports.getRandomBook = function(id, callback) {
   });
 };
 
-exports.getCountOfBooks = function(callback) {
+exports.getCountOfBooks = function (callback) {
   Book.count().then(count => {
     callback(count);
   });
