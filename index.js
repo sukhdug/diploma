@@ -41,28 +41,34 @@ function botCommand (command, callback) {
   });
 }
 
+function recommendBook (rand, chatId, callback) {
+  Books.getRandomBook(rand, function (bookData) {
+    var text = "<b>Название книги:</b> " + bookData.name +
+      "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
+      "\n<b>ISBN:</b> " + bookData.isbn + "\n<b>Рейтинг на сайте LiveLib:</b> " + bookData.rating +
+      "\n<b>Описание книги:</b>\n" + bookData.description +
+      "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
+      callback(text);
+  });
+}
+/*
 function recommendBook (rand, chatId) {
-  var options = {
-    reply_markup: JSON.stringify({
-      inline_keyboard: [
-        [{ text: 'нравится', callback_data: 'like' }],
-        [{ text: 'читал (а)', callback_data: 'read' }],
-        [{ text: 'не нравится', callback_data: 'dislike' }]
-      ],
-      parse_mode: "Markdown",
-    })
-  };
   randomBook(rand, function (bookData) {
-    bot.sendMessage(chatId, "<b>Название книги:</b> " + bookData.name +
+    var text = '';
+    return text = "<b>Название книги:</b> " + bookData.name +
+      "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
+      "\n<b>ISBN:</b> " + bookData.isbn + "\n<b>Рейтинг на сайте LiveLib:</b> " + bookData.rating +
+      "\n<b>Описание книги:</b>\n" + bookData.description +
+      "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
+    /*bot.sendMessage(chatId, "<b>Название книги:</b> " + bookData.name +
       "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
       "\n<b>ISBN:</b> " + bookData.isbn + "\n<b>Рейтинг на сайте LiveLib:</b> " + bookData.rating +
       "\n<b>Описание книги:</b>\n" + bookData.description +
       "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>", { parse_mode: "HTML" }
     );
-    bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
   });
 }
-
+*/
 bot.on('message', function (msg) {
   var chatId = msg.chat.id;
   var user = msg.chat.username;
@@ -95,23 +101,43 @@ bot.on('message', function (msg) {
       bot.sendPhoto(chatId, photo);
     })
   } else if (recommendMessage) {
+    var options = {
+      reply_markup: JSON.stringify({
+        inline_keyboard: [
+          [{ text: 'нравится', callback_data: 'like' }],
+          [{ text: 'читал (а)', callback_data: 'read' }],
+          [{ text: 'не нравится', callback_data: 'dislike' }]
+        ],
+        parse_mode: "Markdown",
+      })
+    };
     var rand = randomInt(1, 422);
     global.randomNumber = rand;
-    recommendBook(rand, chatId);
+    recommendBook(rand, chatId, function (text) {
+      bot.sendMessage(chatId, text,  { parse_mode: "HTML" });
+      bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
+    });
     bot.on('callback_query', function (msg) {
       var answer = msg.data.split('_');
       var index = answer[0];
+      var messageId = msg.message.message_id - 1;
       if (index == 'dislike') {
         var rand = randomInt(1, 422);
-        recommendBook(rand, chatId);
+        global.randomNumber = rand;
+        recommendBook(rand, chatId, function (text) {
+          bot.editMessageText(text, { message_id: messageId, chat_id: chatId, parse_mode: "HTML" });
+        });
       } else if (index == 'read') {
-        console.log(global.randomNumber);
         ReadBooks.setBook(chatId, global.randomNumber);
         var rand = randomInt(1, 422);
         global.randomNumber = rand;
-        recommendBook(rand, chatId);
+        recommendBook(rand, chatId, function (text) {
+          bot.editMessageText(text, { message_id: messageId, chat_id: chatId, parse_mode: "HTML" });
+        });
       } else if (index == 'like') {
-        bot.sendMessage(chatId, "Вам нравится эта книга!");
+        console.log(msg);
+        bot.editMessageText("Edited", { message_id: messageId, chat_id: chatId });
+        //bot.sendMessage(chatId, messageId);
       }
     });
   } else if (readMessage) {
@@ -119,14 +145,12 @@ bot.on('message', function (msg) {
       console.log(books);
       var text = '';
       for (var i = 0; i < books.length; i++) {
-        text += books[i].name;
+        text += "/" + i + ". " + books[i].name;
         text += '\n';
       }
       var options = {
         reply_markup: JSON.stringify({
-          inline_keyboard: [
-            [{text: books[0].name, callback_data: books[0].id}]
-          ]
+          inline_keyboard: books
         })
       }
       console.log(options);
