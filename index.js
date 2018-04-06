@@ -18,7 +18,7 @@ function randomInt (min, max) {
 
 function book (callback) {
   Books.getBook(25, (book) => {
-  callback(book);
+    callback(book);
   });
 }
 
@@ -45,30 +45,11 @@ function recommendBook (rand, chatId, callback) {
   Books.getRandomBook(rand, function (bookData) {
     var text = "<b>Название книги:</b> " + bookData.name +
       "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
-      "\n<b>ISBN:</b> " + bookData.isbn + "\n<b>Рейтинг на сайте LiveLib:</b> " + bookData.rating +
       "\n<b>Описание книги:</b>\n" + bookData.description +
       "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
       callback(text);
   });
 }
-/*
-function recommendBook (rand, chatId) {
-  randomBook(rand, function (bookData) {
-    var text = '';
-    return text = "<b>Название книги:</b> " + bookData.name +
-      "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
-      "\n<b>ISBN:</b> " + bookData.isbn + "\n<b>Рейтинг на сайте LiveLib:</b> " + bookData.rating +
-      "\n<b>Описание книги:</b>\n" + bookData.description +
-      "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
-    /*bot.sendMessage(chatId, "<b>Название книги:</b> " + bookData.name +
-      "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
-      "\n<b>ISBN:</b> " + bookData.isbn + "\n<b>Рейтинг на сайте LiveLib:</b> " + bookData.rating +
-      "\n<b>Описание книги:</b>\n" + bookData.description +
-      "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>", { parse_mode: "HTML" }
-    );
-  });
-}
-*/
 bot.on('message', function (msg) {
   var chatId = msg.chat.id;
   var user = msg.chat.username;
@@ -121,42 +102,60 @@ bot.on('message', function (msg) {
       var answer = msg.data.split('_');
       var index = answer[0];
       var messageId = msg.message.message_id - 1;
-      if (index == 'dislike') {
+      if (index === 'dislike') {
         var rand = randomInt(1, 422);
         global.randomNumber = rand;
+        ReadBooks.getReadBookId(rand, function (id) {
+          if (id !== null ) {
+            global.randomNumber = randomInt(1, 422);
+          }
+        });
+        rand = global.randomNumber;
         recommendBook(rand, chatId, function (text) {
           bot.editMessageText(text, { message_id: messageId, chat_id: chatId, parse_mode: "HTML" });
         });
-      } else if (index == 'read') {
+      } else if (index === 'read') {
         ReadBooks.setBook(chatId, global.randomNumber);
         var rand = randomInt(1, 422);
         global.randomNumber = rand;
+        ReadBooks.getReadBookId(rand, function (id) {
+          if (id !== null ) {
+            global.randomNumber = randomInt(1, 422);
+          }
+        });
+        rand = global.randomNumber;
         recommendBook(rand, chatId, function (text) {
           bot.editMessageText(text, { message_id: messageId, chat_id: chatId, parse_mode: "HTML" });
         });
-      } else if (index == 'like') {
+      } else if (index === 'like') {
         console.log(msg);
         bot.editMessageText("Edited", { message_id: messageId, chat_id: chatId });
-        //bot.sendMessage(chatId, messageId);
       }
     });
   } else if (readMessage) {
     ReadBooks.getListReadBooks(chatId, function (books) {
       console.log(books);
-      var text = '';
-      for (var i = 0; i < books.length; i++) {
-        text += "/" + i + ". " + books[i].name;
-        text += '\n';
-      }
       var options = {
         reply_markup: JSON.stringify({
-          inline_keyboard: books
+          inline_keyboard: [
+            [{ text: '<<', callback_data: 'prev' }],
+            [{ text: 'список', callback_data: books[1].id }],
+            [{ text: '>>', callback_data: 'next' }],
+          ],
+          parse_mode: "Markdown",
         })
       }
-      console.log(options);
-      bot.sendMessage(chatId, text);
+      //console.log(options);
+      //bot.sendMessage(chatId, text);
+      rand = 12;
+      ReadBooks.getReadBook(chatId, function (book) {
+        console.log(book);
+      })
+      recommendBook(rand, chatId, function (text) {
+        bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+        bot.sendMessage(chatId, "Здесь будут выводиться ваши прочитанные книги", options);
+      });
     });
-    bot.sendMessage(chatId, "Здесь будут выводиться ваши прочитанные книги");
   } else {
     bot.sendMessage(chatId, "I don't understand you, " + user + "! Sorry");
   }

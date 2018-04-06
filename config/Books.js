@@ -51,13 +51,13 @@ const Book = sequelize.define('books', {
 
 exports.Book = Book;
 
-exports.getBook = function(id, callback) {
+exports.getBook = function (id, callback) {
   Book.findOne({where: {id: id}}).then(book => {
     callback(book.name);
   });
 };
 
-exports.getRandomBook = function(id, callback) {
+exports.getRandomBook = function (id, callback) {
   Book.findOne({where: {id: id}}).then(book => {
 
     var bookData = {
