@@ -28,7 +28,7 @@ const ReadBook = sequelize.define('read_books', {
   underscored: true
 });
 
-ReadBook.belongsTo(Book, {foreignKey: 'book_id'});
+ReadBook.belongsTo(Book, { foreignKey: 'book_id' });
 
 exports.setBook = function (user_id, book_id) {
   ReadBook.create({ user_id: user_id, book_id: book_id, status: 'added'})
@@ -46,7 +46,6 @@ exports.getReadBook = function (id, callback) {
     where: { user_id: id },
     inlcude: [{
       model: Book
-      //attributes: ['id', 'name', 'authors', 'genres', 'description']
     }]
   }).then(book => {
 
