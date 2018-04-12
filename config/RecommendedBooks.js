@@ -35,9 +35,17 @@ const RecommendedBook = sequelize.define('recommended_books', {
 
 RecommendedBook.belongsTo(Book, { foreignKey: 'book_id' });
 
-exports.setRecommendBook = function (bookId, readerId, reviewId, userId) {
+exports.setRecommendBook = function (bookId, readerId, reviewId, userId, callback) {
   var userChoose = 'recommend';
-  RecommendedBook.create({ book_id: bookId, reader_id: readerId, review_id: reviewId, user_id: userId, user_choose: userChoose });
+  RecommendedBook.create({ book_id: bookId, reader_id: readerId, review_id: reviewId, user_id: userId, user_choose: userChoose })
+  .then( function(err, result) {
+    if (err) {
+      callback(0);
+    } else {
+      console.log(result.id);
+      callback(result.id);
+    }
+  });
 }
 
 exports.getRecommendedBook = function(bookId, callback) {
@@ -50,7 +58,7 @@ exports.getRecommendedBook = function(bookId, callback) {
   }).then(book => {
     var bookArray = JSON.parse(JSON.stringify(book));
     var bookData = {
-      recommend_id: bookArray.id,
+      //recommend_id: bookArray.id,
       review_id: bookArray.review_id,
       reader_id: bookArray.reader_id,
       id: bookArray.book.id,
@@ -60,6 +68,7 @@ exports.getRecommendedBook = function(bookId, callback) {
       description: bookArray.book.description,
       link: bookArray.book.link,
     }
+    console.log(bookArray);
     callback(bookData);
   });
 }

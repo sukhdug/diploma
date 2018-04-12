@@ -14,6 +14,7 @@ var bot = new TelegramBot(token, {polling: true});
 global.randomNumber = 0;
 global.recommendBookId = 0;
 global.recommendBookReaderId = 0;
+global.recommendedBookBookId = 0;
 
 function randomInt (min, max) {
     var rand = min - 0.5 + Math.random() * (max - min + 1);
@@ -48,6 +49,7 @@ function botCommand (command, callback) {
 
 function recommendation (rand, userId, callback) {
   Reviews.getReview(rand, function (review) {
+    console.log(review);
     var reviewId = review.id;
     var bookId = review.book_id;
     var readerId = review.reader_id;
@@ -58,9 +60,10 @@ function recommendation (rand, userId, callback) {
 }
 
 function recommendBook (rand, chatId, callback) {
-  recommendation(60, chatId, function (book) {
-    global.recommendBookId = book.recommend_id;
+  recommendation(rand, chatId, function (book) {
+    //global.recommendBookId = book.recommend_id;
     global.recommendBookReaderId = book.reader_id;
+    global.recommendedBookBookId = book.id;
     var text = "<b>Название книги:</b> " + book.name +
       "\n<b>Автор:</b> " + book.authors + "\n<b>Жанры:</b> " + book.genres +
       "\n<b>Описание книги:</b>\n" + book.description +
@@ -111,7 +114,7 @@ bot.on('message', function (msg) {
         parse_mode: "Markdown",
       })
     };
-    var rand = randomInt(1, 422);
+    var rand = randomInt(1, 99);
     global.randomNumber = rand;
     recommendBook(rand, chatId, function (text) {
       bot.sendMessage(chatId, text,  { parse_mode: "HTML" });
@@ -148,9 +151,15 @@ bot.on('message', function (msg) {
           bot.editMessageText(text, { message_id: messageId, chat_id: chatId, parse_mode: "HTML" });
         });
       } else if (index === 'like') {
-        console.log(msg);
+        //console.log(msg);
         RecommendedBook.updateRecommendedBookStatusToLike(global.recommendBookId);
-        bot.editMessageText("Edited", { message_id: messageId, chat_id: chatId });
+        Recommendation.findReviewOfLikeBook(global.recommendedBookBookId, global.recommendBookReaderId, function (bookId) {
+          recommendBook(bookId, chatId, function (text) {
+            //bot.sendMessage(chatId, text,  { parse_mode: "HTML" });
+            bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
+          });
+        });
+        //bot.editMessageText("Edited", { message_id: messageId, chat_id: chatId });
       }
     });
   } else if (readMessage) {
@@ -171,7 +180,7 @@ bot.on('message', function (msg) {
       rand = 12;
       ReadBooks.getReadBook(chatId, function (book) {
         console.log(book);
-      })
+      });
       recommendBook(rand, chatId, function (text) {
         bot.sendMessage(chatId, text, { parse_mode: "HTML" });
         bot.sendMessage(chatId, "Здесь будут выводиться ваши прочитанные книги", options);

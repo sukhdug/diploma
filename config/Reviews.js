@@ -26,10 +26,24 @@ const Review = sequelize.define('reviews', {
 }, {
   underscored: true
 });
+const Op = Sequelize.Op;
 
 exports.getReview = function (id, callback) {
   Review.findOne({where: {id: id}}).then(review => {
     var reviewArray = JSON.parse(JSON.stringify(review));
     callback(reviewArray);
+  });
+}
+
+exports.getReviewsOfBook = function(bookId, readerId, callback) {
+  Review.findAll({ where: { book_id: { [Op.ne]: bookId }, reader_id: readerId, rate: { [Op.between]: [4, 5]}}})
+  .then(reviews => {
+    var data = JSON.parse(JSON.stringify(reviews));
+    var booksList = [];
+    for (id = 0; id < data.length; id++) {
+      booksList[id] = data[id].book_id;
+    }
+    //console.log(data);
+    callback(booksList);
   });
 }
