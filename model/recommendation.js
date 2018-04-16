@@ -20,8 +20,15 @@ exports.findReviewOfDislikeBook = function(id, callback) {
 }
 
 exports.findReviewOfLikeBook = function(bookId, readerId, callback) {
- Review.getReviewsOfBook(bookId, readerId, function (reviews) {
-	var rec_book = reviews[0];
-	callback(rec_book);
- });
+  Review.getReviewsOfReader(bookId, readerId, function (reviews) {
+    if (reviews !== 'error') {
+      var rec_book = reviews[0];
+      callback(rec_book);
+    } else if (reviews === 'error') {
+      Review.getReviewsOfBook(bookId, readerId, function (reviews) {
+        var rec_book = reviews[0];
+        callback(rec_book);
+      })
+    }
+  });
 }

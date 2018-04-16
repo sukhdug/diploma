@@ -78,3 +78,8 @@ exports.updateRecommendedBookStatusToDislike = function (id) {
   var userChoose = 'dislike';
   RecommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
 }
+
+exports.updateRecommendedBookStatusToRead = function (id) {
+  var userChoose = 'read';
+  RecommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
+}
