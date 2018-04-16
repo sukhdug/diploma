@@ -63,7 +63,7 @@ exports.getLikedBook = function (id, callback) {
 };
 
 exports.getListLikedBooks = function (userId, callback) {
-  ReadBook.findAll({
+  LikedBook.findAll({
       where: {user_id: userId, status: 'added'},
       limit: 10,
       order: [
@@ -71,7 +71,7 @@ exports.getListLikedBooks = function (userId, callback) {
       ],
       include: [{
         model: Book,
-        attributes: ['id', 'name']
+        attributes: ['id', 'name', 'authors']
       }],
       attributes: ['book_id']
     })

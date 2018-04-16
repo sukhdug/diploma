@@ -80,7 +80,8 @@ bot.on('message', function (msg) {
   var helpMessage = (msg.text.toString().toLowerCase().indexOf('справка') === 0) || (msg.text.toString().indexOf('/help') === 0);
   var randomMessage = (msg.text.toString().toLowerCase().indexOf('рандом') === 0) || (msg.text.toString().indexOf('/random') === 0);
   var recommendMessage = (msg.text.toString().toLowerCase().indexOf('рекомендация') === 0) || (msg.text.toString().indexOf('/recommendation') === 0);
-  var readMessage = (msg.text.toString().toLowerCase().indexOf('прочитанные') === 0) || (msg.text.toString().indexOf('/read') === 0);
+  var readMessage = (msg.text.toString().toLowerCase().indexOf('читал') === 0) || (msg.text.toString().indexOf('/read') === 0);
+  var likeMessage = (msg.text.toString().toLowerCase().indexOf('нравится') === 0) || (msg.text.toString().indexOf('/like') === 0);
   if (hiMessage) {
     bot.sendMessage(chatId, "Hello " + user + "!");
   } else if (msg.text.toString().indexOf('/start') === 0) {
@@ -163,24 +164,22 @@ bot.on('message', function (msg) {
   } else if (readMessage) {
     ReadBooks.getListReadBooks(chatId, function (books) {
       console.log(books);
-      var options = {
-        reply_markup: JSON.stringify({
-          inline_keyboard: [
-            [{ text: '<<', callback_data: 'prev' }],
-            [{ text: 'список', callback_data: books[1].id }],
-            [{ text: '>>', callback_data: 'next' }],
-          ],
-          parse_mode: "Markdown",
-        })
+      var text = '';
+      for (var id = 0; id < books.length; id++) {
+        text += '<b>' + books[id].name + '</b>\n' + books[id].authors + '\n\n';
       }
-      rand = 12;
-      ReadBooks.getReadBook(chatId, function (book) {
-        console.log(book);
-      });
-      recommendBook(rand, chatId, function (text) {
-        bot.sendMessage(chatId, text, { parse_mode: "HTML" });
-        bot.sendMessage(chatId, "Здесь будут выводиться ваши прочитанные книги", options);
-      });
+      console.log(text);
+      bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+    });
+  } else if (likeMessage) {
+    LikedBooks.getListLikedBooks(chatId, function (books) {
+      console.log(books);
+      var text = '';
+      for (var id = 0; id < books.length; id++) {
+        text += '<b>' + books[id].name + '</b>\n' + books[id].authors + '\n\n';
+      }
+      console.log(text);
+      bot.sendMessage(chatId, text, { parse_mode: "HTML" });
     });
   } else {
     bot.sendMessage(chatId, "I don't understand you, " + user + "! Sorry");

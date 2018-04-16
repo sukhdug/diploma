@@ -71,7 +71,7 @@ exports.getListReadBooks = function (userId, callback) {
       ],
       include: [{
         model: Book,
-        attributes: ['id', 'name']
+        attributes: ['id', 'name', 'authors']
       }],
       attributes: ['book_id']
     })
