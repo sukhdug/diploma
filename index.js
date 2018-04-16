@@ -9,7 +9,7 @@ var RecommendedBook = require('./config/RecommendedBooks');
 // Токен телеграм-бота
 var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30';
 // Включить опрос сервера
-var bot = new TelegramBot(token, {polling: true});
+var bot = new TelegramBot(token, { polling: true });
 
 global.randomNumber = 0;
 global.recommendBookId = 0;
@@ -50,9 +50,9 @@ function botCommand (command, callback) {
 function recommendation (rand, userId, callback) {
   Reviews.getReview(rand, function (review) {
     console.log(review);
-    var reviewId = review.id;
-    var bookId = review.book_id;
-    var readerId = review.reader_id;
+    var reviewId = review[0];
+    var bookId = review[1];
+    var readerId = review[2];
     Recommendation.recommendedBook(bookId, readerId, reviewId, userId, function (book) {
       callback(book);
     });
@@ -61,7 +61,7 @@ function recommendation (rand, userId, callback) {
 
 function recommendBook (rand, chatId, callback) {
   recommendation(rand, chatId, function (book) {
-    //global.recommendBookId = book.recommend_id;
+    global.recommendBookId = book.recommend_id;
     global.recommendBookReaderId = book.reader_id;
     global.recommendedBookBookId = book.id;
     var text = "<b>Название книги:</b> " + book.name +
@@ -114,7 +114,7 @@ bot.on('message', function (msg) {
         parse_mode: "Markdown",
       })
     };
-    var rand = randomInt(1, 99);
+    var rand = randomInt(1, 790);
     global.randomNumber = rand;
     recommendBook(rand, chatId, function (text) {
       bot.sendMessage(chatId, text,  { parse_mode: "HTML" });
@@ -125,17 +125,12 @@ bot.on('message', function (msg) {
       var index = answer[0];
       var messageId = msg.message.message_id - 1;
       if (index === 'dislike') {
-        //var rand = randomInt(1, 422);
-
-        global.randomNumber = rand;
-        ReadBooks.getReadBookId(rand, function (id) {
-          if (id !== null ) {
-            global.randomNumber = randomInt(1, 422);
-          }
-        });
-        rand = global.randomNumber;
-        recommendBook(rand, chatId, function (text) {
-          bot.editMessageText(text, { message_id: messageId, chat_id: chatId, parse_mode: "HTML" });
+        RecommendedBook.updateRecommendedBookStatusToDislike(global.recommendBookId);
+        global.randomNumber = randomInt(1, 790);
+        Recommendation.findReviewOfDislikeBook(global.randomNumber, function (bookId) {
+          recommendBook(bookId, chatId, function (text) {
+            bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
+          });
         });
       } else if (index === 'read') {
         ReadBooks.setBook(chatId, global.randomNumber);
@@ -151,15 +146,12 @@ bot.on('message', function (msg) {
           bot.editMessageText(text, { message_id: messageId, chat_id: chatId, parse_mode: "HTML" });
         });
       } else if (index === 'like') {
-        //console.log(msg);
         RecommendedBook.updateRecommendedBookStatusToLike(global.recommendBookId);
         Recommendation.findReviewOfLikeBook(global.recommendedBookBookId, global.recommendBookReaderId, function (bookId) {
           recommendBook(bookId, chatId, function (text) {
-            //bot.sendMessage(chatId, text,  { parse_mode: "HTML" });
             bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
           });
         });
-        //bot.editMessageText("Edited", { message_id: messageId, chat_id: chatId });
       }
     });
   } else if (readMessage) {

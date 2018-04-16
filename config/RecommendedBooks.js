@@ -38,19 +38,15 @@ RecommendedBook.belongsTo(Book, { foreignKey: 'book_id' });
 exports.setRecommendBook = function (bookId, readerId, reviewId, userId, callback) {
   var userChoose = 'recommend';
   RecommendedBook.create({ book_id: bookId, reader_id: readerId, review_id: reviewId, user_id: userId, user_choose: userChoose })
-  .then( function(err, result) {
-    if (err) {
-      callback(0);
-    } else {
-      console.log(result.id);
-      callback(result.id);
-    }
+  .then( result => {
+    console.log(result.id);
+    callback(result.id);
   });
 }
 
-exports.getRecommendedBook = function(bookId, callback) {
+exports.getRecommendedBook = function(id, callback) {
   RecommendedBook.findOne({
-    where: { book_id: bookId },
+    where: { id: id },
     include: [{
       model: Book,
       attributes: ['id', 'name', 'authors', 'genres', 'description', 'link']
@@ -58,7 +54,7 @@ exports.getRecommendedBook = function(bookId, callback) {
   }).then(book => {
     var bookArray = JSON.parse(JSON.stringify(book));
     var bookData = {
-      //recommend_id: bookArray.id,
+      recommend_id: bookArray.id,
       review_id: bookArray.review_id,
       reader_id: bookArray.reader_id,
       id: bookArray.book.id,
@@ -68,7 +64,7 @@ exports.getRecommendedBook = function(bookId, callback) {
       description: bookArray.book.description,
       link: bookArray.book.link,
     }
-    console.log(bookArray);
+    console.log(bookData);
     callback(bookData);
   });
 }
@@ -78,4 +74,7 @@ exports.updateRecommendedBookStatusToLike = function (id) {
   RecommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
 }
 
-// Здесь будет функция выбора книг рецензента, если какая-либо определенная книга нравится пользователю
+exports.updateRecommendedBookStatusToDislike = function (id) {
+  var userChoose = 'dislike';
+  RecommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
+}
