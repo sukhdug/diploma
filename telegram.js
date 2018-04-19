@@ -17,14 +17,6 @@ global.recommendBookId = 0;
 global.recommendBookReaderId = 0;
 global.recommendedBookBookId = 0;
 
-function test(){
-  BotCommands.getCommandDescription('start', function (d) {
-      console.log(d);
-  });
-}
-
-test();
-
 function randomInt (min, max) {
     var rand = min - 0.5 + Math.random() * (max - min + 1);
     rand = Math.round(rand);
@@ -135,7 +127,7 @@ bot.on('message', function (msg) {
     var rand = randomInt(1, 790);
     global.randomNumber = rand;
     recommendBook(rand, chatId, function (text) {
-      bot.sendMessage(chatId, text,  { parse_mode: "HTML" });
+      bot.sendMessage(chatId, text, { parse_mode: "HTML" });
       bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
     });
     bot.on('callback_query', function (msg) {
