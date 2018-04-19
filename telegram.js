@@ -5,7 +5,7 @@ var LikedBooks = require('./model/LikedBooks');
 var Users = require('./model/Users');
 var Reviews = require('./model/Reviews');
 var BotCommands = require('./model/BotCommands');
-var Recommendation = require('./model/recommendation');
+var Recommendation = require('./recommendation');
 var RecommendedBook = require('./model/RecommendedBooks');
 // Токен телеграм-бота
 var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30';
@@ -16,6 +16,14 @@ global.randomNumber = 0;
 global.recommendBookId = 0;
 global.recommendBookReaderId = 0;
 global.recommendedBookBookId = 0;
+
+function test(){
+  BotCommands.getCommandDescription('start', function (d) {
+      console.log(d);
+  });
+}
+
+test();
 
 function randomInt (min, max) {
     var rand = min - 0.5 + Math.random() * (max - min + 1);

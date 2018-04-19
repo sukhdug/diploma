@@ -1,34 +1,4 @@
-const Sequelize = require('sequelize');
-const Book = require('./Books').Book;
-
-const sequelize = new Sequelize('mysql://diploma:diploma@localhost:3306/diploma');
-
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
-
-const LikedBook = sequelize.define('liked_books', {
-  user_id: {
-    type: Sequelize.INTEGER
-  },
-  book_id: {
-    type: Sequelize.INTEGER
-  },
-  status: {
-    type: Sequelize.STRING
-  }
-}, {
-  timestamps: false
-}, {
-  underscored: true
-});
-
-LikedBook.belongsTo(Book, { foreignKey: 'book_id' });
+var LikedBook = require('./../entity/LikedBook').LikedBook;
 
 exports.setBook = function (user_id, book_id) {
   LikedBook.create({ user_id: user_id, book_id: book_id, status: 'added'})

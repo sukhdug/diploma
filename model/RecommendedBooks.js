@@ -1,39 +1,4 @@
-const Sequelize = require('sequelize');
-const Book = require('./Books').Book;
-const Review = require('./Reviews').Review;
-const Reader = require('./Readers').Reader;
-const sequelize = new Sequelize('mysql://diploma:diploma@localhost:3306/diploma');
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
-const RecommendedBook = sequelize.define('recommended_books', {
-  book_id: {
-    type: Sequelize.INTEGER
-  },
-  reader_id: {
-    type: Sequelize.INTEGER
-  },
-  review_id: {
-    type: Sequelize.INTEGER
-  },
-  user_id: {
-    type: Sequelize.INTEGER
-  },
-  user_choose: {
-    type: Sequelize.STRING
-  }
-}, {
-  timestamps: false
-}, {
-  underscored: true
-});
-
-RecommendedBook.belongsTo(Book, { foreignKey: 'book_id' });
+var RecommendedBook = require('./../entity/RecommendedBook').RecommendedBook;
 
 exports.setRecommendBook = function (bookId, readerId, reviewId, userId, callback) {
   var userChoose = 'recommend';

@@ -1,32 +1,5 @@
-const Sequelize = require('sequelize');
-
-const sequelize = new Sequelize('mysql://diploma:diploma@localhost:3306/diploma');
-
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
-
-const Review = sequelize.define('reviews', {
-  book_id: {
-    type: Sequelize.INTEGER
-  },
-  reader_id: {
-    type: Sequelize.INTEGER
-  },
-  rate: {
-    type: Sequelize.STRING
-  }
-}, {
-  timestamps: false
-}, {
-  underscored: true
-});
-const Op = Sequelize.Op;
+var Review = require('./../entity/Review').Review;
+var Op = require('./../config/config').Op;
 
 exports.getReview = function (id, callback) {
   Review.findOne({where: {id: id}}).then(review => {
@@ -73,7 +46,6 @@ exports.getReviewsOfBook = function(bookId, readerId, callback) {
     }
   });
 }
-
 
 exports.getRandomReview = function(id, callback) {
   Review.findAll({where: {id: id}})
