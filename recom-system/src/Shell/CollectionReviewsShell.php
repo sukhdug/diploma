@@ -39,9 +39,9 @@ class CollectionReviewsShell extends Shell {
      */
     public function main() {
 
-        //for ($id = 51; $id < 100; $id++){
+        //for ($id = 100; $id < 150; $id++) {
             //$this->collectionReviewsByBooks($id);
-            $this->addCollectionReview(100);
+            $this->addCollectionReview(108);
         //}
         //$this->changeStatusCollectionReviews(2334);
     }
@@ -168,14 +168,14 @@ class CollectionReviewsShell extends Shell {
                         return true;
                     } else {
                         $this->out('Читателя нет в БД');
-                        $add = $this->Readers->addReader($reader);
-                        if($add) {
-                            $this->out('Читатель добавлен');
-                            return true;
-                        } else {
-                            $this->out('Неизвестная ошибка');
-                            return false;
-                        }
+                        //$add = $this->Readers->addReader($reader);
+                        //if($add) {
+                        //    $this->out('Читатель добавлен');
+                        //    return true;
+                        //} else {
+                        //    $this->out('Неизвестная ошибка');
+                        //    return false;
+                        //}
                     }
                 } else {
                     return false;
