@@ -73,6 +73,14 @@ function recommendBook (rand, chatId, callback) {
     console.log(global.recommendBookReaderId);
   });
 }
+
+function fillDisplayBookArray(array, bookName, id){
+  array.push([{
+    text: bookName,
+    callback_data: id
+  }]);
+}
+
 bot.on('message', function (msg) {
   var chatId = msg.chat.id;
   var user = msg.chat.username;
@@ -97,7 +105,8 @@ bot.on('message', function (msg) {
     var options = {
       reply_markup: JSON.stringify({
         inline_keyboard: [
-          [{ text: 'другую', callback_data: 'other'}],
+          [{ text: 'показать другую книгу', callback_data: 'other'}],
+          [{ text: 'сохранить книгу', callback_data: 'save'}]
         ],
         parse_mode: "Markdown"
       })
@@ -109,9 +118,7 @@ bot.on('message', function (msg) {
         "\n<b>Описание книги:</b>\n" + bookData.description +
         "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>", { parse_mode: "HTML" }
       );
-      bot.sendMessage(chatId, "Нажмите, чтобы показать другую книгу", options);
-      var photo = bookData.cover;
-     // bot.sendPhoto(chatId, photo);
+      bot.sendMessage(chatId, "Выберите", options);
     })
   } else if (recommendMessage) {
     var options = {
@@ -163,23 +170,25 @@ bot.on('message', function (msg) {
     });
   } else if (readMessage) {
     ReadBooks.getListReadBooks(chatId, function (books) {
-      console.log(books);
-      var text = '';
-      for (var id = 0; id < books.length; id++) {
-        text += '<b>' + books[id].name + '</b>\n' + books[id].authors + '\n\n';
+      var buttons = [];
+      for (var i = 0; i < books.length; i++) {
+        fillDisplayBookArray(buttons, books[i].name, books[i].id);
       }
-      console.log(text);
-      bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+      var options = {
+        reply_markup: JSON.stringify({ inline_keyboard: buttons, parse_mode: "HTML", })
+      };
+      bot.sendMessage(chatId, 'Ваши прочитанные книги', options);
     });
   } else if (likeMessage) {
     LikedBooks.getListLikedBooks(chatId, function (books) {
-      console.log(books);
-      var text = '';
-      for (var id = 0; id < books.length; id++) {
-        text += '<b>' + books[id].name + '</b>\n' + books[id].authors + '\n\n';
+      var buttons = [];
+      for (var i = 0; i < books.length; i++) {
+        fillDisplayBookArray(buttons, books[i].name, books[i].id);
       }
-      console.log(text);
-      bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+      var options = {
+        reply_markup: JSON.stringify({ inline_keyboard: buttons, parse_mode: "HTML", })
+      };
+      bot.sendMessage(chatId, 'Ваши любимые книги', options);
     });
   } else {
     bot.sendMessage(chatId, "I don't understand you, " + user + "! Sorry");
