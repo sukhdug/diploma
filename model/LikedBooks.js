@@ -1,4 +1,5 @@
 var LikedBook = require('./../entity/LikedBook').LikedBook;
+var Book = require('./../entity/Book').Book;
 
 exports.setBook = function (user_id, book_id) {
   LikedBook.create({ user_id: user_id, book_id: book_id, status: 'added'})
