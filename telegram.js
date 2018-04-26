@@ -231,17 +231,26 @@ bot.on('message', function (msg) {
         var answer = msg.data.split('_');
         var index = answer[0];
         var messageId = msg.message.message_id;
-        Books.getRandomBook(index, function (book) {
-        var text = "<b>Название книги:</b> " + book.name +
-          "\n<b>Автор:</b> " + book.authors + "\n<b>Жанры:</b> " + book.genres +
-          "\n<b>Описание книги:</b>\n" + book.description +
-          "\n<a href='" + book.link + "'>Читать рецензии на сайте LiveLib</a>";
+        randomBook(index, function (bookData) {
+          var text = "<b>Название книги:</b> " + bookData.name +
+            "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
+            "\n<b>Описание книги:</b>\n" + bookData.description +
+            "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
           bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
         });
       });
       }
     });
   } else if (likeMessage) {
+    showLikedBooks(chatId);
+  } else {
+    bot.sendMessage(chatId, "I don't understand you, " + user + "! Sorry");
+  }
+});
+
+function showLikedBooks (chatId) {
+  showList(chatId);
+  function showList(chatId) {
     LikedBooks.getListLikedBooks(chatId, function (books) {
       if (books == 'empty') {
         bot.sendMessage(chatId, 'У вас пока нет понравившихся книг');
@@ -254,21 +263,45 @@ bot.on('message', function (msg) {
           reply_markup: JSON.stringify({ inline_keyboard: buttons, parse_mode: "HTML", })
         };
         bot.sendMessage(chatId, 'Ваши любимые книги', options);
-        bot.on('callback_query', function (msg) {
-          var answer = msg.data.split('_');
-          var index = answer[0];
-          var messageId = msg.message.message_id;
-          Books.getRandomBook(index, function (book) {
-          var text = "<b>Название книги:</b> " + book.name +
-            "\n<b>Автор:</b> " + book.authors + "\n<b>Жанры:</b> " + book.genres +
-            "\n<b>Описание книги:</b>\n" + book.description +
-            "\n<a href='" + book.link + "'>Читать рецензии на сайте LiveLib</a>";
-            bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
-          });
-        });
       }
     });
-  } else {
-    bot.sendMessage(chatId, "I don't understand you, " + user + "! Sorry");
   }
-});
+  bot.on('callback_query', function (msg) {
+    var answer = msg.data.split('_');
+    var index = answer[0];
+    var messageId = msg.message.message_id;
+    var opts = { reply_markup: JSON.stringify({
+      inline_keyboard: [
+        [{ text: 'назад', callback_data: 'ago' }]
+      ],
+        parse_mode: "Markdown",
+      })
+    };
+    if (index == 'ago') {
+      LikedBooks.getListLikedBooks(chatId, function (books) {
+        if (books == 'empty') {
+          bot.sendMessage(chatId, 'У вас пока нет понравившихся книг');
+        } else {
+          var buttons = [];
+          for (var i = 0; i < books.length; i++) {
+            fillDisplayBookArray(buttons, books[i].name, books[i].id);
+          }
+          var options = {
+            reply_markup: JSON.stringify({ inline_keyboard: buttons, parse_mode: "HTML", })
+          };
+          bot.deleteMessage(chatId, messageId -1);
+          bot.editMessageReplyMarkup( options.reply_markup, { message_id: messageId, chat_id: chatId });
+        }
+      });
+    } else {
+      randomBook(index, function (bookData) {
+        var text = "<b>Название книги:</b> " + bookData.name +
+                  "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
+                  "\n<b>Описание книги:</b>\n" + bookData.description +
+                  "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
+        bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
+        bot.sendMessage(chatId, 'Нажмите, чтобы вернуться', opts);
+      });
+    }
+  });
+}
