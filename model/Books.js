@@ -10,7 +10,6 @@ exports.getBook = function (id, callback) {
 
 exports.getRandomBook = function (id, callback) {
   Book.findOne({where: {id: id}}).then(book => {
-
     var bookData = {
       id: book.id,
       name: book.name,

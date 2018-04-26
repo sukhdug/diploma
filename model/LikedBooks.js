@@ -47,11 +47,15 @@ exports.getListLikedBooks = function (userId, callback) {
       attributes: ['book_id']
     })
   .then(books => {
-    var data = JSON.parse(JSON.stringify(books));
-    var booksList = [];
-    for (var i = 0; i < data.length; i++) {
-      booksList[i] = data[i].book;
+    if (typeof books !== 'undefined' && books.length > 0) {
+      var data = JSON.parse(JSON.stringify(books));
+      var booksList = [];
+      for (var i = 0; i < data.length; i++) {
+        booksList[i] = data[i].book;
+      }
+      callback(booksList);
+    } else {
+      callback('empty');
     }
-    callback(booksList);
   });
 }
