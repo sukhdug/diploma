@@ -1,4 +1,5 @@
 'use strict';
+
 var TelegramBot = require('node-telegram-bot-api');
 var Books = require('./model/Books');
 var ReadBooks = require('./model/ReadBooks');
@@ -83,51 +84,51 @@ function fillDisplayBookArray(array, bookName, id){
   }]);
 }
 
-function sendingMessage(){
-bot.on('message', function (msg) {
-  var chatId = msg.chat.id;
-  var user = msg.chat.username;
-  var hiMessage = (msg.text.toString().toLowerCase().indexOf('hi') === 0);
-  var helpMessage = (msg.text.toString().toLowerCase().indexOf('справка') === 0) || (msg.text.toString().indexOf('/help') === 0);
-  var randomMessage = (msg.text.toString().toLowerCase().indexOf('рандом') === 0) || (msg.text.toString().indexOf('/random') === 0);
-  var recommendMessage = (msg.text.toString().toLowerCase().indexOf('рекомендация') === 0) || (msg.text.toString().indexOf('/recommendation') === 0);
-  var readMessage = (msg.text.toString().toLowerCase().indexOf('читал') === 0) || (msg.text.toString().indexOf('/read') === 0);
-  var likeMessage = (msg.text.toString().toLowerCase().indexOf('нравится') === 0) || (msg.text.toString().indexOf('/like') === 0);
-  if (hiMessage) {
-    bot.sendMessage(chatId, "Hello " + user + "!");
-  } else if (msg.text.toString().indexOf('/start') === 0) {
-    botCommand('start', function (description) {
-      bot.sendMessage(chatId, description, { parse_mode: "HTML"});
-    });
-    Users.setUser(user, chatId);
-  } else if (helpMessage) {
-    botCommand('help', function (description) {
-      bot.sendMessage(chatId, description, { parse_mode: "HTML" });
-    });
-  } else if (randomMessage) {
-    showRandomBook(chatId)
-  } else if (recommendMessage) {
-    var options = {
-      reply_markup: JSON.stringify({
-        inline_keyboard: [
-          [{ text: 'нравится', callback_data: 'like' }],
-          [{ text: 'читал (а)', callback_data: 'read' }],
-          [{ text: 'не нравится', callback_data: 'dislike' }]
-        ],
-        parse_mode: "Markdown",
-      })
-    };
-    var rand = randomInt(1, 790);
-    global.randomNumber = rand;
-    recommendBook(rand, chatId, function (text) {
-      bot.sendMessage(chatId, text, { parse_mode: "HTML" });
-      bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
-    });
-    bot.on('callback_query', function (msg) {
-      var answer = msg.data.split('_');
-      var index = answer[0];
-      var messageId = msg.message.message_id - 1;
-      if (index === 'dislike') {
+function sendingMessage() {
+  bot.on('message', function (msg) {
+    var chatId = msg.chat.id;
+    var user = msg.chat.username;
+    var hiMessage = (msg.text.toString().toLowerCase().indexOf('hi') === 0);
+    var helpMessage = (msg.text.toString().toLowerCase().indexOf('справка') === 0) || (msg.text.toString().indexOf('/help') === 0);
+    var randomMessage = (msg.text.toString().toLowerCase().indexOf('рандом') === 0) || (msg.text.toString().indexOf('/random') === 0);
+    var recommendMessage = (msg.text.toString().toLowerCase().indexOf('рекомендация') === 0) || (msg.text.toString().indexOf('/recommendation') === 0);
+    var readMessage = (msg.text.toString().toLowerCase().indexOf('читал') === 0) || (msg.text.toString().indexOf('/read') === 0);
+    var likeMessage = (msg.text.toString().toLowerCase().indexOf('нравится') === 0) || (msg.text.toString().indexOf('/like') === 0);
+    if (hiMessage) {
+      bot.sendMessage(chatId, "Hello " + user + "!");
+    } else if (msg.text.toString().indexOf('/start') === 0) {
+      botCommand('start', function (description) {
+        bot.sendMessage(chatId, description, { parse_mode: "HTML"});
+      });
+      Users.setUser(user, chatId);
+    } else if (helpMessage) {
+      botCommand('help', function (description) {
+        bot.sendMessage(chatId, description, { parse_mode: "HTML" });
+      });
+    } else if (randomMessage) {
+      showRandomBook(chatId)
+    } else if (recommendMessage) {
+      var options = {
+        reply_markup: JSON.stringify({
+          inline_keyboard: [
+            [{ text: 'нравится', callback_data: 'like' }],
+            [{ text: 'читал (а)', callback_data: 'read' }],
+            [{ text: 'не нравится', callback_data: 'dislike' }]
+          ],
+          parse_mode: "Markdown",
+        })
+      };
+      var rand = randomInt(1, 790);
+      global.randomNumber = rand;
+      recommendBook(rand, chatId, function (text) {
+        bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+        bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
+      });
+      bot.on('callback_query', function (msg) {
+        var answer = msg.data.split('_');
+        var index = answer[0];
+        var messageId = msg.message.message_id - 1;
+        if (index === 'dislike') {
         RecommendedBook.updateRecommendedBookStatusToDislike(global.recommendBookId);
         global.randomNumber = randomInt(1, 790);
         Recommendation.findReviewOfDislikeBook(global.randomNumber, function (bookId) {
@@ -162,7 +163,6 @@ bot.on('message', function (msg) {
     bot.sendMessage(chatId, "I don't understand you, " + user + "! Sorry");
   }
 });
-
 }
 
 function showRandomBook(chatId) {
@@ -308,7 +308,6 @@ function showSavedBooks (chatId, howSave) {
       });
     }
   });
-  //callBackQuery(chatId);
 }
 
 function callBackQuery(chatId) {

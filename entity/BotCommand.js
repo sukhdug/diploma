@@ -1,5 +1,7 @@
+'use strict';
+
 var Sequelize = require('sequelize');
-var sequelize = require('./../config/config').sequelize;
+var sequelize = require('./../config/config');
 
 var BotCommand = sequelize.define('bot_commands', {
   command: {
@@ -12,4 +14,4 @@ var BotCommand = sequelize.define('bot_commands', {
 	timestamps: false
 });
 
-exports.BotCommand = BotCommand;
+module.exports = BotCommand;

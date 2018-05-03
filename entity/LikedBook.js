@@ -1,6 +1,8 @@
+'use strict';
+
 var Sequelize = require('sequelize');
-var sequelize = require('./../config/config').sequelize;
-var Book = require('./Book').Book;
+var sequelize = require('./../config/config');
+var Book = require('./Book');
 
 var LikedBook = sequelize.define('liked_books', {
   user_id: {
@@ -20,4 +22,4 @@ var LikedBook = sequelize.define('liked_books', {
 
 LikedBook.belongsTo(Book, { foreignKey: 'book_id' });
 
-exports.LikedBook = LikedBook;
+module.exports = LikedBook;

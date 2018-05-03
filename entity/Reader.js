@@ -1,5 +1,7 @@
+'use strict';
+
 var Sequelize = require('sequelize');
-var sequelize = require('./../config/config').sequelize;
+var sequelize = require('./../config/config');
 
 var Reader = sequelize.define('readers', {
   username: {
@@ -20,4 +22,4 @@ var Reader = sequelize.define('readers', {
   underscored: true
 });
 
-exports.Reader = Reader;
+module.exports = Reader;

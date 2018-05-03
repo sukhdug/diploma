@@ -1,5 +1,7 @@
-var ReadBook = require('./../entity/ReadBook').ReadBook;
-var Book = require('./../entity/Book').Book;
+'use strict';
+
+var ReadBook = require('./../entity/ReadBook');
+var Book = require('./../entity/Book');
 
 exports.setBook = function (user_id, book_id) {
   ReadBook.create({ user_id: user_id, book_id: book_id, status: 'added'})

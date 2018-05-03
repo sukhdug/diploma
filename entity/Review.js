@@ -1,5 +1,7 @@
+'use strict';
+
 const Sequelize = require('sequelize');
-var sequelize = require('./../config/config').sequelize;
+var sequelize = require('./../config/config');
 
 const Review = sequelize.define('reviews', {
   book_id: {
@@ -17,4 +19,4 @@ const Review = sequelize.define('reviews', {
   underscored: true
 });
 
-exports.Review = Review;
+module.exports = Review;

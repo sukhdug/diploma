@@ -1,3 +1,5 @@
+'use strict';
+
 var Book = require('./model/Books');
 var Reader = require('./model/Readers');
 var Review = require('./model/Reviews');

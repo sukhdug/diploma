@@ -1,4 +1,6 @@
-var User = require('./../entity/User').User;
+'use strict';
+
+var User = require('./../entity/User');
 
 exports.setUser = function(username, telegram_id) {
 

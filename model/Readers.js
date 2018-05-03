@@ -1,1 +1,3 @@
-var Reader = require('./../entity/Reader').Reader;
+'use strict';
+
+var Reader = require('./../entity/Reader');

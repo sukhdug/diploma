@@ -1,5 +1,7 @@
-var RecommendedBook = require('./../entity/RecommendedBook').RecommendedBook;
-var Book = require('./../entity/Book').Book;
+'use strict'
+
+var RecommendedBook = require('./../entity/RecommendedBook');
+var Book = require('./../entity/Book');
 
 exports.setRecommendBook = function (bookId, readerId, reviewId, userId, callback) {
   var userChoose = 'recommend';

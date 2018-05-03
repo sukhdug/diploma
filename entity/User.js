@@ -1,5 +1,7 @@
+'use strict';
+
 var Sequelize = require('sequelize');
-var sequelize = require('./../config/config').sequelize;
+var sequelize = require('./../config/config');
 
 var User = sequelize.define('users', {
   username: {
@@ -12,4 +14,4 @@ var User = sequelize.define('users', {
   timestamps: false
 });
 
-exports.User = User;
+module.exports = User;

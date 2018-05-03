@@ -1,5 +1,7 @@
+'use strict';
+
 var Sequelize = require('sequelize');
-var sequelize = require('./../config/config').sequelize;
+var sequelize = require('./../config/config');
 
 var Book = sequelize.define('books', {
   name: {
@@ -39,4 +41,4 @@ var Book = sequelize.define('books', {
   timestamps: false
 });
 
-exports.Book = Book;
+module.exports = Book;

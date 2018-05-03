@@ -1,4 +1,6 @@
-var Book = require('./../entity/Book').Book;
+'use strict';
+
+var Book = require('./../entity/Book');
 
 exports.Book = Book;
 
