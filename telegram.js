@@ -20,38 +20,38 @@ global.recommendBookReaderId = 0;
 global.recommendedBookBookId = 0;
 global.addedToRead = 0;
 global.bookId = 0; // ID рекомендованной или по
-function randomInt (min, max) {
+function randomInt(min, max) {
     var rand = min - 0.5 + Math.random() * (max - min + 1);
     rand = Math.round(rand);
     return rand;
 }
 
-function book (callback) {
+function book(callback) {
   Books.getBook(25, (book) => {
     callback(book);
   });
 }
 
-function randomBook (number, callback) {
+function randomBook(number, callback) {
   var id = number;
   Books.getRandomBook(id, (bookData) => {
     callback(bookData);
   });
 }
 
-function countBooks () {
+function countBooks() {
   Books.getCountOfBooks((count) => {
     return count;
   });
 }
 
-function botCommand (command, callback) {
+function botCommand(command, callback) {
   BotCommands.getCommandDescription(command, (description) => {
     callback(description);
   });
 }
 
-function recommendation (rand, userId, callback) {
+function recommendation(rand, userId, callback) {
   Reviews.getReview(rand, function (review) {
     console.log(review);
     var reviewId = review[0];
@@ -63,7 +63,7 @@ function recommendation (rand, userId, callback) {
   });
 }
 
-function recommendBook (rand, chatId, callback) {
+function recommendBook(rand, chatId, callback) {
   recommendation(rand, chatId, function (book) {
     global.recommendBookId = book.recommend_id;
     global.recommendBookReaderId = book.reader_id;
@@ -266,7 +266,7 @@ function showRandomBook(chatId) {
     });
 }
 
-function showSavedBooks (chatId, howSave) {
+function showSavedBooks(chatId, howSave) {
   showList(chatId);
   function showList(chatId) {
     if (howSave == 'liked') {
