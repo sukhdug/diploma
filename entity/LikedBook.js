@@ -6,13 +6,27 @@ var Book = require('./Book');
 
 var LikedBook = sequelize.define('liked_books', {
   user_id: {
-    type: Sequelize.INTEGER
+    type: Sequelize.INTEGER,
+    validate: {
+      notEmpty: true,
+      isInt: true,
+      max: 11
+    }
   },
   book_id: {
-    type: Sequelize.INTEGER
+    type: Sequelize.INTEGER,
+    validate: {
+      notEmpty: true,
+      isInt: true,
+      max: 11
+    }
   },
   status: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+      max: 45
+    }
   }
 }, {
   timestamps: false

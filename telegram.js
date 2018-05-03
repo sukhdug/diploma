@@ -10,9 +10,9 @@ var BotCommands = require('./model/BotCommands');
 var Recommendation = require('./recommendation');
 var RecommendedBook = require('./model/RecommendedBooks');
 // Токен телеграм-бота
-var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30';
+var TOKEN = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30';
 // Включить опрос сервера
-var bot = new TelegramBot(token, { polling: true });
+var bot = new TelegramBot(TOKEN, { polling: true });
 
 global.randomNumber = 0;
 global.recommendBookId = 0;
