@@ -25,7 +25,7 @@ var Reader = sequelize.define('readers', {
   link: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true
+      notEmpty: true,
       isUrl: true
     }
   }
