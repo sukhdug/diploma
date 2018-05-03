@@ -1,7 +1,7 @@
 'use strict';
 
 var Sequelize = require('sequelize');
-var sequelize = require('./../config/config');
+var sequelize = require('./../../config/config');
 
 var BotCommand = sequelize.define('bot_commands', {
   command: {

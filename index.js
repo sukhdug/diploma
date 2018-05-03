@@ -8,4 +8,4 @@ var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30',
   };
 
 // launch the bot
-require('./telegram')(token, options);
+require('./src/telegram')(token, options);

@@ -1,7 +1,7 @@
 'use strict';
 
 const Sequelize = require('sequelize');
-var sequelize = require('./../config/config');
+var sequelize = require('./../../config/config');
 
 const Review = sequelize.define('reviews', {
   book_id: {

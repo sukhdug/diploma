@@ -1,7 +1,7 @@
 'use strict';
 
 var Sequelize = require('sequelize');
-var sequelize = require('./../config/config');
+var sequelize = require('./../../config/config');
 
 var Reader = sequelize.define('readers', {
   username: {

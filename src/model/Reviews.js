@@ -1,5 +1,5 @@
 var Review = require('./../entity/Review');
-var Op = require('./../config/op');
+var Op = require('./../../config/op');
 
 exports.getReview = function (id, callback) {
   Review.findOne({where: {id: id}}).then(review => {
