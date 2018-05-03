@@ -7,8 +7,7 @@ var User = sequelize.define('users', {
   username: {
     type: Sequelize.INTEGER,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
     }
   },
   telegram_id: {

@@ -7,15 +7,13 @@ var BotCommand = sequelize.define('bot_commands', {
   command: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
     }
   },
   description: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
     }
   }
 }, {

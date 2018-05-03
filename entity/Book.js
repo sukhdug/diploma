@@ -7,43 +7,37 @@ var Book = sequelize.define('books', {
   name: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
     }
   },
   authors: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
     }
   },
   cover: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
     }
   },
   genres: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
     }
   },
   isbn: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
     }
   },
   rating: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: false,
-      max: 10
+      notEmpty: false
     }
   },
   description: {
@@ -56,14 +50,14 @@ var Book = sequelize.define('books', {
     type: Sequelize.STRING,
     validate: {
       notEmpty: true,
-      max: 255
+      max: 255,
+      isUrl: true
     }
   },
   fromsite: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 45
+      notEmpty: true
     }
   },
   reviews_count: {

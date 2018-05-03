@@ -11,37 +11,32 @@ var RecommendedBook = sequelize.define('recommended_books', {
     type: Sequelize.INTEGER,
     validate: {
       notEmpty: true,
-      isInt: true,
-      max: 11
+      isInt: true
     }
   },
   reader_id: {
     type: Sequelize.INTEGER,
     validate: {
       notEmpty: true,
-      isInt: true,
-      max: 11
+      isInt: true
     }
   },
   review_id: {
     type: Sequelize.INTEGER,
     validate: {
       notEmpty: true,
-      isInt: true,
-      max: 11
+      isInt: true
     }
   },
   user_id: {
     type: Sequelize.INTEGER,
     notEmpty: true,
-    isInt: true,
-    max: 11
+    isInt: true
   },
   user_choose: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: false,
-      max: 100
+      notEmpty: false
     }
   }
 }, {

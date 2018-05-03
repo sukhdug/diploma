@@ -7,29 +7,26 @@ var Reader = sequelize.define('readers', {
   username: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
     }
   },
   fromsite: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 45
+      notEmpty: true
     }
   },
   reviews_count: {
     type: Sequelize.INTEGER,
     validate: {
-      isInt: true,
-      max: 11
+      isInt: true
     }
   },
   link: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 255
+      notEmpty: true
+      isUrl: true
     }
   }
 }, {

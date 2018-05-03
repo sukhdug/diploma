@@ -9,23 +9,20 @@ var ReadBook = sequelize.define('read_books', {
     type: Sequelize.INTEGER,
     validate: {
       notEmpty: true,
-      isInt: true,
-      max: 11
+      isInt: true
     }
   },
   book_id: {
     type: Sequelize.INTEGER,
     validate: {
       notEmpty: true,
-      isInt: true,
-      max: 11
+      isInt: true
     }
   },
   status: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: true,
-      max: 45
+      notEmpty: true
     }
   }
 }, {

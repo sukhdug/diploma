@@ -8,23 +8,20 @@ const Review = sequelize.define('reviews', {
     type: Sequelize.INTEGER,
     validate: {
       notEmpty: true,
-      isInt: true,
-      max: 11
+      isInt: true
     }
   },
   reader_id: {
     type: Sequelize.INTEGER,
     validate: {
       notEmpty: true,
-      isInt: true,
-      max: 11
+      isInt: true
     }
   },
   rate: {
     type: Sequelize.STRING,
     validate: {
-      notEmpty: false,
-      max: 10
+      notEmpty: false
     }
   }
 }, {
