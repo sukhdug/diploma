@@ -71,10 +71,6 @@ module.exports = function(token, options) {
   }).catch(function () {
     exit('Error starting the Bot... maybe the TOKEN is wrong?');
   });
-  // add function to reset the bot
-  bot.reset = function () {
-    return redis.clear();
-  };
 
   return bot;
 }

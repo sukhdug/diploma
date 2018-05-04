@@ -2,9 +2,8 @@
 
 var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30',
   options = {
-    redisUrl: process.env.REDIS_URL,
-    webHook: process.env.WEBHOOK_URL,
-    port: process.env.PORT
+    webHook: 'https://handy-bot.herokuapp.com',
+    port: 5000
   };
 
 // launch the bot
