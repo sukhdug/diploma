@@ -2,8 +2,8 @@
 
 var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30',
   options = {
-    webHook: 'https://handy-bot.herokuapp.com',
-    port: 5000
+    webHook: 0,
+    port: 0
   };
 
 // launch the bot
