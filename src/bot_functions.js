@@ -109,7 +109,6 @@ function buildInlineKeyboards(buttons) {
   return options;
 }
 
-
 BotFunctions.prototype.showRecommendation = function(chatId) {
   var bot = this.bot;
   var buttons = [
@@ -176,6 +175,8 @@ BotFunctions.prototype.showRandomBook = function(chatId) {
     [{ text: "читал(а)", callback_data: "imread"}]
   ];
   var options = buildInlineKeyboards(buttons);
+  var addedToRead = 0;
+  var addedToSave = 0;
   /*
   var options = {
     reply_markup: JSON.stringify({
@@ -226,12 +227,20 @@ BotFunctions.prototype.showRandomBook = function(chatId) {
         if (global.addedToRead == 1) {
           bot.editMessageReplyMarkup( options.reply_markup, { message_id: messageId, chat_id: chatId });
           global.addedToRead = 0;
+          addedToRead = 0;
         }
       });
     } else if (index == 'imread') {
       global.addedToRead = 1;
+      addedToRead = 1;
       ReadBooks.setBook(chatId, global.bookId);
-      var opt = {
+      var buttons = [
+        [{ text: "показать другую", callback_data: "other"}],
+        [{ text: "сохранить", callback_data: save}],
+        [{ text: "добавлено в прочитанные", callback_data: "."}]
+      ];
+      var options = buildInlineKeyboards(buttons);
+      /*var opt = {
         reply_markup: JSON.stringify({
           inline_keyboard: [
             [{ text: 'показать другую книгу', callback_data: 'other'}],
@@ -240,8 +249,10 @@ BotFunctions.prototype.showRandomBook = function(chatId) {
           ],
           parse_mode: "Markdown"
         })
-      };
+      };*/
       bot.editMessageReplyMarkup( opt.reply_markup, { message_id: messageId, chat_id: chatId });
+    } else if (index == 'save') {
+      addedToSave = 1;
     }
   });
 }
@@ -263,9 +274,10 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
       for (var i = 0; i < books.length; i++) {
         fillDisplayBookArray(buttons, books[i].name, books[i].id);
       }
-      var options = {
+      var options = buildInlineKeyboards(buttons);
+      /*var options = {
         reply_markup: JSON.stringify({ inline_keyboard: buttons, parse_mode: "HTML", })
-      };
+      };*/
       bot.sendMessage(chatId, 'Ваши прочитанные книги', options);
     }
   });

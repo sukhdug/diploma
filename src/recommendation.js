@@ -34,3 +34,28 @@ exports.findReviewOfLikeBook = function(bookId, readerId, callback) {
     }
   });
 }
+
+function Recommendation() {
+}
+
+Recommendation.prototype.recommendedBook = function(bookId, readerId, reviewId, userId, callback) {
+  RecommendedBook.setRecommendBook(bookId, readerId, reviewId, userId, function (result) {
+    RecommendedBook.getRecommendedBook(result, function (book) {
+      callback(book);
+    });
+  });
+}
+
+Recommendation.prototype.findReviewOfLikeBook = function(bookId, readerId, callback) {
+  Review.getReviewsOfReader(bookId, readerId, function (reviews) {
+    if (reviews !== 'error') {
+      var rec_book = reviews[0];
+      callback(rec_book);
+    } else if (reviews === 'error') {
+      Review.getReviewsOfBook(bookId, readerId, function (reviews) {
+        var rec_book = reviews[0];
+        callback(rec_book);
+      });
+    }
+  });
+}

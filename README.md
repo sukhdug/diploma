@@ -4,18 +4,18 @@ This README would normally document whatever steps are necessary to get your app
 
 ### What is this repository for? ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+Это телеграм-бот рекомендации книг, разработанный в качестве выпускной квалификационной работы.
 
-### How do I get set up? ###
+### Установка ###
+Для того, чтобы запустить данного бота, Вам понадобится установить платформу [Node.JS](https://nodejs.org/en/download/package-manager/) 
+и пакетный менеджер [NPM](https://www.npmjs.com/get-npm).
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+Если Вы уже установили Node.JS и NPM, выполните следующую команду для клонирования репозитория
+в интерпретаторе командной строки (CLI)
+
+```shell
+git clone https://sukhdug@bitbucket.org/sukhdug/telegram-bot.git
+```
 
 ### Contribution guidelines ###
 
