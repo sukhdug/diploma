@@ -38,37 +38,9 @@ LikedBooks.prototype.getLikedBook = function (id, callback) {
   });
 };
 
-LikedBooks.prototype.getListLikedBooks = function (userId, callback) {
-  LikedBook.findAll({
-      where: {user_id: userId, status: 'added'},
-      limit: 10,
-      order: [
-        [Book, 'name', 'ASC']
-      ],
-      include: [{
-        model: Book,
-        attributes: ['id', 'name', 'authors']
-      }],
-      attributes: ['book_id']
-    })
-  .then(books => {
-    if (typeof books !== 'undefined' && books.length > 0) {
-      var data = JSON.parse(JSON.stringify(books));
-      var booksList = [];
-      for (var i = 0; i < data.length; i++) {
-        booksList[i] = data[i].book;
-      }
-      callback(booksList);
-    } else {
-      callback('empty');
-    }
-  });
-}
-
 LikedBooks.prototype.getListUserBooks = function (userId, callback) {
   LikedBook.findAll({
       where: {user_id: userId, status: 'added'},
-      limit: 10,
       order: [
         [Book, 'name', 'ASC']
       ],

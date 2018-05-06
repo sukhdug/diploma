@@ -47,7 +47,7 @@ module.exports = function(token, options) {
       var user = msg.chat.username;
       switch (command) {
         case '/start':
-          func.welcome(chatId);
+          func.welcome(user, chatId);
           break;
         case '/help':
           func.help(chatId);

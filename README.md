@@ -16,6 +16,7 @@ This README would normally document whatever steps are necessary to get your app
 ```shell
 git clone https://sukhdug@bitbucket.org/sukhdug/telegram-bot.git
 ```
+После этого
 
 ### Contribution guidelines ###
 

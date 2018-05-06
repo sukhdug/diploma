@@ -31,10 +31,13 @@ function book(callback) {
   });
 }
 
-function randomBook(number, callback) {
-  var id = number;
+function _randomBook(id, callback) {
   Books.getRandomBook(id, (bookData) => {
-    callback(bookData);
+    var text = "<b>Название книги:</b> " + bookData.name +
+        "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
+        "\n<b>Описание книги:</b>\n" + bookData.description +
+        "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
+    callback(text);
   });
 }
 
@@ -77,13 +80,13 @@ function recommendBook(rand, chatId, callback) {
 }
 
 function fillDisplayBookArray(array, bookName, id) {
-  array.push([{
+  array.push({
     text: bookName,
     callback_data: id
-  }]);
+  });
 }
 
-BotFunctions.prototype.welcome = function(chatId) {
+BotFunctions.prototype.welcome = function(user, chatId) {
   var bot = this.bot;
   botCommand('start', function (description) {
     bot.sendMessage(chatId, description, { parse_mode: "HTML"});
@@ -161,20 +164,15 @@ BotFunctions.prototype.showRandomBook = function(chatId) {
   var readBooks = new ReadBooks();
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
-    [{ text: "сохранить", callback_data: "save"}],
-    [{ text: "читал(а)", callback_data: "imread"}]
+    [{ text: "сохранить", callback_data: "save"},
+    { text: "читал(а)", callback_data: "imread"}]
   ];
   var options = buildInlineKeyboards(buttons);
   var addedToRead = 0;
   var addedToSave = 0;
   var rand = randomInt(1, 422);
   global.bookId = rand;
-  console.log(global.bookId);
-  randomBook(rand, function (bookData) {
-    var text = "<b>Название книги:</b> " + bookData.name +
-        "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
-        "\n<b>Описание книги:</b>\n" + bookData.description +
-        "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
+  var func = _randomBook(rand, function (text) {
     bot.sendMessage(chatId, text, { parse_mode: "HTML" });
     bot.sendMessage(chatId, "Выберите", options);
   });
@@ -185,27 +183,20 @@ BotFunctions.prototype.showRandomBook = function(chatId) {
     if (index == 'other') {
       var rand = randomInt(1, 422);
       global.bookId = rand;
-      console.log(global.bookId);
-      randomBook(rand, function (bookData) {
-        var text = "<b>Название книги:</b> " + bookData.name +
-            "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
-            "\n<b>Описание книги:</b>\n" + bookData.description +
-            "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
-        var buttons = [
-          [{ text: "показать другую", callback_data: "other"}],
-          [{ text: "сохранить", callback_data: "save"}],
-          [{ text: "читал(а)", callback_data: "imread"}]
-        ];
-        var options = buildInlineKeyboards(buttons);
+      var buttons = [
+        [{ text: "показать другую", callback_data: "other"}],
+        [{ text: "сохранить", callback_data: "save"},
+        { text: "читал(а)", callback_data: "imread"}]
+      ];
+      var options = buildInlineKeyboards(buttons);
+      var func = _randomBook(rand, function (text) {
         bot.editMessageText(text, { message_id: messageId - 1, chat_id: chatId , parse_mode: "HTML"});
         if (addedToRead == 1) {
           bot.editMessageReplyMarkup( options.reply_markup, { message_id: messageId, chat_id: chatId });
-          global.addedToRead = 0;
           addedToRead = 0;
         }
       });
     } else if (index == 'imread') {
-      global.addedToRead = 1;
       addedToRead = 1;
       readBooks.setBook(chatId, global.bookId);
       var buttons = [
@@ -229,54 +220,79 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
   } else if (howSave == 'read') {
     object = new ReadBooks();
   }
+  var prev = 0;
+  var prevId = 0;
+  var next = 0;
+  var nextId = 0;
+  var booksArray = [];
+  var booksLength = 0;
   object.getListUserBooks(chatId, function (books) {
     if (books == 'empty') {
       bot.sendMessage(chatId, 'У вас пока нет понравившихся книг');
     } else {
-      var buttons = [];
+      booksArray = books;
       console.log(books);
-      for (var i = 0; i < books.length; i++) {
-        fillDisplayBookArray(buttons, books[i].name, books[i].id);
-      }
+      var buttons = [
+        [
+          { text: "<<", callback_data: "prev"},
+          { text: "список", callback_data: "list"},
+          { text: ">>", callback_data: "next"}
+        ]
+      ];
       var options = buildInlineKeyboards(buttons);
-      bot.sendMessage(chatId, 'Ваши прочитанные книги', options);
+      var id = books[0].id;
+      booksLength = books.length;
+      for (var i = 0; i < books.length; i++) {
+        if (i == 1) {
+          next = books[i].id;
+          nextId = i;
+        }
+        if (i == books.length - 1) {
+          prev = books[i].id;
+          prevId = i;
+        }
+      }
+      var func = _randomBook(id, function (text) {
+        bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+        bot.sendMessage(chatId, 'Ваши прочитанные книги', options);
+      });
     }
   });
   bot.on('callback_query', function (msg) {
     var answer = msg.data.split('_');
-    var index = answer[0];
+    var callback = answer[0];
     var messageId = msg.message.message_id - 1;
-    if (index == 'ago') {
-      object.getListUserBooks(chatId, function (books) {
-        if (books == 'empty') {
-          bot.sendMessage(chatId, 'У вас пока нет понравившихся книг');
+    if (callback == 'prev') {
+      console.log(booksArray);
+      var func = _randomBook(prev, function (text) {
+        bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
+        if (prevId == 0) {
+          next = booksArray[prevId].id;
+          nextId = prevId - 1;
+          prev = booksArray[booksArray.length - 2].id;
+          prevId = booksArray.length - 1;
         } else {
-          var buttons = [];
-          for (var i = 0; i < books.length; i++) {
-            fillDisplayBookArray(buttons, books[i].name, books[i].id);
-          }
-          var options = {
-            reply_markup: JSON.stringify({ inline_keyboard: buttons, parse_mode: "HTML", })
-          };
-          bot.deleteMessage(chatId, messageId -1);
-          bot.editMessageReplyMarkup( options.reply_markup, { message_id: messageId, chat_id: chatId });
+          next = booksArray[prevId].id;
+          nextId = prevId;
+          prev = booksArray[prevId - 1].id;
+          prevId = prevId - 1;
         }
       });
-    } else {
-      randomBook(index, function (bookData) {
-        var opts = { reply_markup: JSON.stringify({
-          inline_keyboard: [
-            [{ text: 'назад', callback_data: 'ago' }]
-          ],
-            parse_mode: "Markdown",
-          })
-        };
-        var text = "<b>Название книги:</b> " + bookData.name +
-                    "\n<b>Автор:</b> " + bookData.authors + "\n<b>Жанры:</b> " + bookData.genres +
-                    "\n<b>Описание книги:</b>\n" + bookData.description +
-                    "\n<a href='" + bookData.link + "'>Читать рецензии на сайте LiveLib</a>";
+    }
+    if (callback == 'next') {
+      var func = _randomBook(next, function (text) {
         bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
-        bot.sendMessage(chatId, 'Нажмите, чтобы вернуться', opts);
+        if (nextId == booksArray.length - 1) {
+          prev = booksArray[booksArray.length - 2].id;
+          prevId = nextId;
+          next = booksArray[0].id;
+          nextId = 0;
+        } else {
+          prev = booksArray[nextId].id;
+          prevId = nextId;
+          next = booksArray[nextId + 1].id;
+          nextId = nextId + 1;
+        }
       });
     }
   });
