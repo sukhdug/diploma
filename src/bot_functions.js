@@ -113,6 +113,7 @@ function buildInlineKeyboards(buttons) {
 
 BotFunctions.prototype.showRecommendation = function(chatId) {
   var bot = this.bot;
+  var likedBooks = new LikedBooks();
   var readBooks = new ReadBooks();
   var buttons = [
     [{ text: 'нравится', callback_data: 'like'}],
@@ -148,7 +149,7 @@ BotFunctions.prototype.showRecommendation = function(chatId) {
         });
       });
     } else if (index === 'like') {
-      LikedBooks.setBook(chatId, global.recommendedBookBookId);
+      likedBooks.setBook(chatId, global.recommendedBookBookId);
       RecommendedBook.updateRecommendedBookStatusToLike(global.recommendBookId);
       Recommendation.findReviewOfLikeBook(global.recommendedBookBookId, global.recommendBookReaderId, function (bookId) {
         recommendBook(bookId, chatId, function (text) {
@@ -172,7 +173,7 @@ BotFunctions.prototype.showRandomBook = function(chatId) {
   var addedToSave = 0;
   var rand = randomInt(1, 422);
   global.bookId = rand;
-  var func = _randomBook(rand, function (text) {
+  var send = _randomBook(rand, function (text) {
     bot.sendMessage(chatId, text, { parse_mode: "HTML" });
     bot.sendMessage(chatId, "Выберите", options);
   });

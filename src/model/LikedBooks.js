@@ -6,8 +6,12 @@ var Book = require('./../entity/Book');
 function LikedBooks() {
 }
 
-LikedBooks.prototype.setBook = function (user_id, book_id) {
-  LikedBook.create({ user_id: user_id, book_id: book_id, status: 'added'})
+LikedBooks.prototype.setBook = function (userId, bookId) {
+  LikedBook.findOrCreate({ where: { user_id: userId, book_id: bookId, status: 'added'}})
+  .spread((book, created) => {
+    console.log(book.get());
+    console.log(created);
+  });
 };
 
 LikedBooks.prototype.getLikedBookId = function (id, callback) {
