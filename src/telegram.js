@@ -67,7 +67,36 @@ module.exports = function(token, options) {
         default:
           func.unknown(chatId);
       }
-    })
+    });
+    bot.on('callback_query', function (callbackQuery) {
+      const action = callbackQuery.data;
+      const msg = callbackQuery.message;
+      const telegramOptions = {
+        chat_id: msg.chat.id,
+        message_id: msg.message_id,
+      };
+      let text;
+
+      if (action === 'list') {
+        text = 'Edited Text';
+        bot.editMessageText(text, telegramOptions);
+      }
+      if (action === 'other') {
+        func.editRandomBook(telegramOptions);
+      }
+      if (action === 'imread') {
+        func.setToReadRandomBook(telegramOptions);
+      }
+      if (action === 'next') {
+        func.showNextSavedBooks(telegramOptions);
+      }
+      if (action === 'prev') {
+        func.showPrevSavedBooks(telegramOptions);
+      }
+
+      //bot.editMessageText(text, opts);
+    });
+
   }).catch(function () {
     exit('Error starting the Bot... maybe the TOKEN is wrong?');
   });

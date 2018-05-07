@@ -29,6 +29,13 @@ var randNumber = 0;
 
 function BotFunctions(bot) {
   this.bot = bot;
+  this.randBook = 0;
+  this.likedBooksOptions = {};
+  this.readBooksOptions = {};
+  this.booksArray = [];
+  this.readBooksArray = [];
+  this.likedBooksArray = [];
+  this.howSaved = '';
 }
 
 function randomInt(min, max) {
@@ -162,64 +169,11 @@ BotFunctions.prototype.showRecommendation = function(chatId) {
   });
 }
 
-BotFunctions.prototype.showRandomBook = function(chatId) {
-  var bot =  this.bot;
-  var readBooks = new ReadBooks();
-  var buttons = [
-    [{ text: "показать другую", callback_data: "other"}],
-    [{ text: "сохранить", callback_data: "save"},
-     { text: "читал(а)", callback_data: "imread"}]
-  ];
-  var options = buildInlineKeyboards(buttons);
-  var addedToRead = 0;
-  var addedToSave = 0;
-  var rand = randomInt(1, 422);
-  global.bookId = rand;
-  var send = displayBook(rand, function (text) {
-    bot.sendMessage(chatId, text, { parse_mode: "HTML" });
-    setTimeout( function () {
-      bot.sendMessage(chatId, "Выберите", options);
-    }, 1000);
-  });
-  bot.on('callback_query', function (msg) {
-    var answer = msg.data.split('_');
-    var index = answer[0];
-    var messageId = msg.message.message_id;
-    if (index == 'other') {
-      var rand = randomInt(1, 422);
-      global.bookId = rand;
-      var buttons = [
-        [{ text: "показать другую", callback_data: "other"}],
-        [{ text: "сохранить", callback_data: "save"},
-        { text: "читал(а)", callback_data: "imread"}]
-      ];
-      var options = buildInlineKeyboards(buttons);
-      var func = displayBook(rand, function (text) {
-        bot.editMessageText(text, { message_id: messageId - 1, chat_id: chatId , parse_mode: "HTML"});
-        if (addedToRead == 1) {
-          bot.editMessageReplyMarkup( options.reply_markup, { message_id: messageId, chat_id: chatId });
-          addedToRead = 0;
-        }
-      });
-    } else if (index == 'imread') {
-      addedToRead = 1;
-      readBooks.setBook(chatId, global.bookId);
-      var buttons = [
-        [{ text: "показать другую", callback_data: "other"}],
-        [{ text: "сохранить", callback_data: "save" }],
-        [{ text: "добавлено в прочитанные", callback_data: "..."}]
-      ];
-      var options = buildInlineKeyboards(buttons);
-      bot.editMessageReplyMarkup( options.reply_markup, { message_id: messageId, chat_id: chatId });
-    } else if (index == 'save') {
-      addedToSave = 1;
-    }
-  });
-}
-
 BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
   var object = null;
   var bot = this.bot;
+  var savedBooksOptions = {};
+  var booksArray = [];
   var howSaved = '';
   if (howSave == "liked") {
     object = new LikedBooks();
@@ -228,47 +182,51 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
     object = new ReadBooks();
     howSaved = "прочитанные";
   }
-  var prev = 0;
-  var prevId = 0;
-  var next = 0;
-  var nextId = 0;
-  var booksArray = [];
-  var booksLength = 0;
   object.getListUserBooks(chatId, function (books) {
     if (books == 'empty') {
       bot.sendMessage(chatId, 'У Вас пока нет сохраненных книг в ' + howSaved);
     } else {
-      booksArray = books;
       console.log(books);
       var buttons = [
         [
           { text: "<<", callback_data: "prev"},
-          { text: "список", callback_data: "list"},
+          { text: "список", callback_data: "list" },
           { text: ">>", callback_data: "next"}
         ]
       ];
       var options = buildInlineKeyboards(buttons);
       var id = books[0].id;
-      booksLength = books.length;
-      for (var i = 0; i < books.length; i++) {
+      savedBooksOptions.booksLength = books.length;
+      for (var i = 0; i < savedBooksOptions.booksLength; i++) {
         if (i == 1) {
-          next = books[i].id;
-          nextId = i;
+          savedBooksOptions.next = books[i].id;
+          savedBooksOptions.nextId = i;
         }
-        if (i == books.length - 1) {
-          prev = books[i].id;
-          prevId = i;
+        if (i == savedBooksOptions.booksLength - 1) {
+          savedBooksOptions.prev = books[i].id;
+          savedBooksOptions.prevId = i;
         }
       }
       var send = displayBook(id, function (text) {
         bot.sendMessage(chatId, text, { parse_mode: "HTML" });
-        setTimeout( function () {
-          bot.sendMessage(chatId, "Ваши " + howSaved + " книги", options);
-        }, 1000);
+        if (savedBooksOptions.booksLength > 1) {
+          setTimeout( function () {
+            bot.sendMessage(chatId, "Ваши " + howSaved + " книги", options);
+          }, 1000);
+        }
       });
     }
   });
-  bot.on('callback_query', function (msg) {
+  if (howSave == "liked") {
+    this.howSaved = "понравившиеся";
+    this.likedBooksOptions = savedBooksOptions;
+    this.likedBooksArray = global.booksArray;
+  } else if (howSave == "read") {
+    this.howSaved = "прочитанные";
+    this.readBooksOptions = savedBooksOptions;
+    this.readBooksArray = booksArray;
+  }
+  /*bot.on('callback_query', function (msg) {
     var answer = msg.data.split('_');
     var callback = answer[0];
     var messageId = msg.message.message_id - 1;
@@ -305,7 +263,121 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
         }
       });
     }
+  });*/
+}
+
+BotFunctions.prototype.showNextSavedBooks = function(params) {
+  var bot = this.bot;
+  var books = [];
+  var array = {};
+  var howSaved = this.howSaved;
+  if (howSaved === "понравившиеся") {
+    array = this.likedBooksOptions;
+    books = this.likedBooksArray;
+  }
+  if (howSaved === "прочитанные") {
+    array = this.readBooksOptions;
+    books = this.readBooksArray;
+  }
+  console.log(books);
+  var send = displayBook(array.next, function (text) {
+    bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: params.chat_id, parse_mode: "HTML" });
+    if (array.nextId == books.length - 1) {
+      array.prev = books[books.length - 1].id;
+      array.prevId = array.nextId;
+      array.next = books[0].id;
+      array.nextId = 0;
+    } else {
+      array.prev = books[array.nextId].id;
+      array.prevId = array.nextId;
+      array.next = books[array.nextId + 1].id;
+      array.nextId = array.nextId + 1;
+    }
   });
+}
+
+BotFunctions.prototype.showPrevSavedBooks = function(params) {
+  var bot = this.bot;
+  var books = this.booksArray;
+  var array = {};
+  var howSaved = this.howSaved;
+  console.log(howSaved);
+  if (howSaved === "понравившиеся") {
+    array = this.likedBooksOptions;
+  }
+  if (howSaved === "прочитанные") {
+    array = this.readBooksOptions;
+  }
+  console.log(array);
+  var send = displayBook(array.next, function (text) {
+    bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: params.chat_id, parse_mode: "HTML" });
+    if (array.prevId == 0) {
+      array.next = books[array.prevId].id;
+      array.nextId = prevId - 1;
+      array.prev = books[array.length - 1].id;
+      array.prevId = books.length - 1;
+    } else {
+      array.next = books[array.prevId].id;
+      array.nextId = array.prevId;
+      array.prev = books[array.prevId - 1].id;
+      array.prevId = array.prevId - 1;
+    }
+  });
+}
+
+BotFunctions.prototype.showRandomBook = function(chatId) {
+  var bot =  this.bot;
+  var readBooks = new ReadBooks();
+  var buttons = [
+    [{ text: "показать другую", callback_data: "other"}],
+    [{ text: "сохранить", callback_data: "save"},
+     { text: "читал(а)", callback_data: "imread"}]
+  ];
+  var options = buildInlineKeyboards(buttons);
+  var addedToRead = 0;
+  var addedToSave = 0;
+  var rand = randomInt(1, 422);
+  this.randBook = rand;
+  var send = displayBook(rand, function (text) {
+    bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+    setTimeout( function () {
+      bot.sendMessage(chatId, "Выберите", options);
+    }, 1000);
+  });
+}
+
+BotFunctions.prototype.editRandomBook = function(params) {
+  var bot =  this.bot;
+  var buttons = [
+    [{ text: "показать другую", callback_data: "other"}],
+    [{ text: "сохранить", callback_data: "save"},
+    { text: "читал(а)", callback_data: "imread"}]
+  ];
+  var options = buildInlineKeyboards(buttons);
+  var rand = randomInt(1, 422);
+  this.randBook = rand;
+  var send = displayBook(rand, function (text) {
+    bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: params.chat_id , parse_mode: "HTML"});
+  });
+  if (this.addedToRead == 1) {
+    bot.editMessageReplyMarkup( options.reply_markup, { message_id: params.message_id, chat_id: params.chat_id });
+    this.addedToRead = 0;
+  }
+}
+
+BotFunctions.prototype.setToReadRandomBook = function(params) {
+  var bot =  this.bot;
+  var buttons = [
+    [{ text: "показать другую", callback_data: "other"}],
+    [{ text: "сохранить", callback_data: "save" }],
+    [{ text: "добавлено в прочитанные", callback_data: "..."}]
+  ];
+  var options = buildInlineKeyboards(buttons);
+  this.addedToRead = 1;
+  var bookId = this.randBook;
+  readBooks.setBook(params.chat_id, bookId);
+  var options = buildInlineKeyboards(buttons);
+  bot.editMessageReplyMarkup( options.reply_markup, { message_id: params.message_id, chat_id: params.chat_id });
 }
 
 module.exports = BotFunctions;
