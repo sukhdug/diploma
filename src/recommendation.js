@@ -4,55 +4,33 @@ var Book = require('./model/Books');
 var Reader = require('./model/Readers');
 var Review = require('./model/Reviews');
 var User = require('./model/Users');
-var RecommendedBook = require('./model/RecommendedBooks');
+var RecommendedBooks = require('./model/RecommendedBooks');
+
+var recommendedBooks = new RecommendedBooks();
+var review = new Review();
 
 exports.recommendedBook = function (bookId, readerId, reviewId, userId, callback) {
-  RecommendedBook.setRecommendBook(bookId, readerId, reviewId, userId, function (result) {
-    RecommendedBook.getRecommendedBook(result, function (book) {
+  recommendedBooks.setRecommendBook(bookId, readerId, reviewId, userId, function (result) {
+    recommendedBooks.getRecommendedBook(result, function (book) {
       callback(book);
   	});
   });
 }
 
 exports.findReviewOfDislikeBook = function(id, callback) {
-  Review.getRandomReview(id, function (reviews) {
+  review.getRandomReview(id, function (reviews) {
 	var rec_book = reviews[0];
 	callback(rec_book);
   });
 }
 
 exports.findReviewOfLikeBook = function(bookId, readerId, callback) {
-  Review.getReviewsOfReader(bookId, readerId, function (reviews) {
+  review.getReviewsOfReader(bookId, readerId, function (reviews) {
     if (reviews !== 'error') {
       var rec_book = reviews[0];
       callback(rec_book);
     } else if (reviews === 'error') {
-      Review.getReviewsOfBook(bookId, readerId, function (reviews) {
-        var rec_book = reviews[0];
-        callback(rec_book);
-      });
-    }
-  });
-}
-
-function Recommendation() {
-}
-
-Recommendation.prototype.recommendedBook = function(bookId, readerId, reviewId, userId, callback) {
-  RecommendedBook.setRecommendBook(bookId, readerId, reviewId, userId, function (result) {
-    RecommendedBook.getRecommendedBook(result, function (book) {
-      callback(book);
-    });
-  });
-}
-
-Recommendation.prototype.findReviewOfLikeBook = function(bookId, readerId, callback) {
-  Review.getReviewsOfReader(bookId, readerId, function (reviews) {
-    if (reviews !== 'error') {
-      var rec_book = reviews[0];
-      callback(rec_book);
-    } else if (reviews === 'error') {
-      Review.getReviewsOfBook(bookId, readerId, function (reviews) {
+      review.getReviewsOfBook(bookId, readerId, function (reviews) {
         var rec_book = reviews[0];
         callback(rec_book);
       });

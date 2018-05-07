@@ -67,9 +67,7 @@ module.exports = function(token, options) {
         default:
           func.unknown(chatId);
       }
-    }).catch ( function () {
-      console.log('Error! Maybe, user send not text format message!');
-    });
+    })
   }).catch(function () {
     exit('Error starting the Bot... maybe the TOKEN is wrong?');
   });

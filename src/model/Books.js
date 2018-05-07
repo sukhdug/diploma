@@ -2,12 +2,12 @@
 
 var Book = require('./../entity/Book');
 
+var book = Book;
+
 function Books() {
-  this.book = new Book();
 }
 
 Books.prototype.getBook = function (id, callback) {
-  var book = this.book;
   book.findOne({where: {id: id}}).then(book => {
     var bookData = {
       id: book.id,
@@ -25,7 +25,6 @@ Books.prototype.getBook = function (id, callback) {
 };
 
 Books.prototype.getCountOfBooks = function (callback) {
-  var book = this.book;
   book.count().then(count => {
     callback(count);
   });

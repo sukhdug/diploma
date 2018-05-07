@@ -1,12 +1,12 @@
 var Review = require('./../entity/Review');
 var Op = require('./../../config/op');
 
+var review = Review;
+
 function Reviews() {
-  this.review = new Review();
 }
 
 Reviews.prototype.getReview = function (id, callback) {
-  var review = this.review;
   review.findOne({where: {id: id}}).then(review => {
     var reviewArray = JSON.parse(JSON.stringify(review));
     var reviewData = [];
@@ -19,7 +19,6 @@ Reviews.prototype.getReview = function (id, callback) {
 }
 
 Reviews.prototype.getReviewsOfReader = function(bookId, readerId, callback) {
-  var review = this.review;
   review.findAll({ where: { book_id: { [Op.ne]: bookId }, reader_id: readerId, rate: { [Op.between]: [4, 5]}}})
   .then(reviews => {
     if(typeof reviews !== 'undefined' && reviews.length > 0) {
@@ -37,7 +36,6 @@ Reviews.prototype.getReviewsOfReader = function(bookId, readerId, callback) {
 }
 
 Reviews.prototype.getReviewsOfBook = function(bookId, readerId, callback) {
-  var review = this.review;
   review.findAll({ where: { book_id: bookId, reader_id: { [Op.ne]: readerId }, rate: { [Op.between]: [4, 5]}}})
   .then(reviews => {
     if (typeof reviews !== 'undefined' && reviews.length > 0) {
@@ -55,7 +53,6 @@ Reviews.prototype.getReviewsOfBook = function(bookId, readerId, callback) {
 }
 
 Reviews.prototype.getRandomReview = function(id, callback) {
-  var review = this.review;
   review.findAll({where: {id: id}})
   .then(reviews => {
     var data = JSON.parse(JSON.stringify(reviews));

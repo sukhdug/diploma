@@ -3,13 +3,13 @@
 var LikedBook = require('./../entity/LikedBook');
 var Book = require('./../entity/Book');
 
+var likedBook = LikedBook;
+var book = Book;
+
 function LikedBooks() {
-  this.likedBook = new LikedBook();
-  this.book = new Book();
 }
 
 LikedBooks.prototype.setBook = function (userId, bookId) {
-  var likedBook = this.likedBook;
   likedBook.findOrCreate({ where: { user_id: userId, book_id: bookId, status: 'added'}})
   .spread((book, created) => {
     console.log(book.get());
@@ -18,7 +18,6 @@ LikedBooks.prototype.setBook = function (userId, bookId) {
 };
 
 LikedBooks.prototype.getLikedBookId = function (id, callback) {
-  var likedBook = this.likedBook;
   likedBook.findOne({where: {book_id: id}, attributes: ['id']}).then(book => {
     var id = JSON.parse(JSON.stringify(book));
     callback(id);
@@ -26,8 +25,6 @@ LikedBooks.prototype.getLikedBookId = function (id, callback) {
 };
 
 LikedBooks.prototype.getLikedBook = function (id, callback) {
-  var likedBook = this.likedBook;
-  var book = this.book;
   likedBook.findOne({
     where: { user_id: id },
     inlcude: [{
@@ -49,8 +46,6 @@ LikedBooks.prototype.getLikedBook = function (id, callback) {
 };
 
 LikedBooks.prototype.getListUserBooks = function (userId, callback) {
-  var likedBook = this.likedBook;
-  var book = this.book;
   likedBook.findAll({
       where: {user_id: userId, status: 'added'},
       order: [

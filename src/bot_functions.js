@@ -36,13 +36,7 @@ function randomInt(min, max) {
   rand = Math.round(rand);
   return rand;
 }
-/*
-function book(callback) {
-  books.getBook(25, (book) => {
-    callback(book);
-  });
-}
-*/
+
 function displayBook(id, callback) {
   books.getBook(id, (bookArray) => {
     var text = "<b>Название книги:</b> " + bookArray.name +
@@ -52,13 +46,7 @@ function displayBook(id, callback) {
     callback(text);
   });
 }
-/*
-function countBooks() {
-  books.getCountOfBooks((count) => {
-    return count;
-  });
-}
-*/
+
 function getBotCommandDescription(command, callback) {
   botCommands.getCommandDescription(command, (description) => {
     callback(description);
@@ -135,7 +123,9 @@ BotFunctions.prototype.showRecommendation = function(chatId) {
   randNumber = rand;
   recommendBook(rand, chatId, function (text) {
     bot.sendMessage(chatId, text, { parse_mode: "HTML" });
-    bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
+    setTimeout( function () {
+      bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
+    }, 1000);
   });
   bot.on('callback_query', function (msg) {
     var answer = msg.data.split('_');
@@ -189,7 +179,7 @@ BotFunctions.prototype.showRandomBook = function(chatId) {
     bot.sendMessage(chatId, text, { parse_mode: "HTML" });
     setTimeout( function () {
       bot.sendMessage(chatId, "Выберите", options);
-    }, 0);
+    }, 1000);
   });
   bot.on('callback_query', function (msg) {
     var answer = msg.data.split('_');
@@ -230,10 +220,13 @@ BotFunctions.prototype.showRandomBook = function(chatId) {
 BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
   var object = null;
   var bot = this.bot;
-  if (howSave == 'liked') {
+  var howSaved = '';
+  if (howSave == "liked") {
     object = new LikedBooks();
-  } else if (howSave == 'read') {
+    howSaved = "понравившиеся";
+  } else if (howSave == "read") {
     object = new ReadBooks();
+    howSaved = "прочитанные";
   }
   var prev = 0;
   var prevId = 0;
@@ -243,7 +236,7 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
   var booksLength = 0;
   object.getListUserBooks(chatId, function (books) {
     if (books == 'empty') {
-      bot.sendMessage(chatId, 'У вас пока нет понравившихся книг');
+      bot.sendMessage(chatId, 'У Вас пока нет сохраненных книг в ' + howSaved);
     } else {
       booksArray = books;
       console.log(books);
@@ -269,7 +262,9 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
       }
       var send = displayBook(id, function (text) {
         bot.sendMessage(chatId, text, { parse_mode: "HTML" });
-        bot.sendMessage(chatId, 'Ваши прочитанные книги', options);
+        setTimeout( function () {
+          bot.sendMessage(chatId, "Ваши " + howSaved + " книги", options);
+        }, 1000);
       });
     }
   });
@@ -284,7 +279,7 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
         if (prevId == 0) {
           next = booksArray[prevId].id;
           nextId = prevId - 1;
-          prev = booksArray[booksArray.length - 2].id;
+          prev = booksArray[booksArray.length - 1].id;
           prevId = booksArray.length - 1;
         } else {
           next = booksArray[prevId].id;
@@ -298,7 +293,7 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
       var send = displayBook(next, function (text) {
         bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
         if (nextId == booksArray.length - 1) {
-          prev = booksArray[booksArray.length - 2].id;
+          prev = booksArray[booksArray.length - 1].id;
           prevId = nextId;
           next = booksArray[0].id;
           nextId = 0;
