@@ -2,9 +2,13 @@
 
 var User = require('./../entity/User');
 
-exports.setUser = function(username, telegram_id) {
+function Users() {
+  this.user = new User();
+}
 
-  User.findOne({where: {telegram_id: telegram_id}}).then(user => {
+Users.prototype.setUser = function(username, telegram_id) {
+  var user = this.user;
+  user.findOne({where: {telegram_id: telegram_id}}).then(user => {
     if (user) {
       console.log("Пользователь существует");
     } else {
@@ -15,3 +19,5 @@ exports.setUser = function(username, telegram_id) {
     }
   });
 };
+
+module.exports = Users;

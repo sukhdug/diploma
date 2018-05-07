@@ -4,10 +4,13 @@ var ReadBook = require('./../entity/ReadBook');
 var Book = require('./../entity/Book');
 
 function ReadBooks() {
+  this.readBook = new ReadBook();
+  this.book = new Book();
 }
 
 ReadBooks.prototype.setBook = function (userId, bookId) {
-  ReadBook.findOrCreate({ where: { user_id: userId, book_id: bookId, status: 'added'}})
+  var readBook = this.readBook;
+  readBook.findOrCreate({ where: { user_id: userId, book_id: bookId, status: 'added'}})
   .spread((book, created) => {
     console.log(book.get());
     console.log(created);
@@ -15,22 +18,23 @@ ReadBooks.prototype.setBook = function (userId, bookId) {
 };
 
 ReadBooks.prototype.getReadBookId = function (id, callback) {
-  ReadBook.findOne({where: {book_id: id}, attributes: ['id']}).then(book => {
+  var readBook = this.readBook;
+  readBook.findOne({where: {book_id: id}, attributes: ['id']}).then(book => {
     var id = JSON.parse(JSON.stringify(book));
     callback(id);
   });
 };
 
 ReadBooks.prototype.getReadBook = function (id, callback) {
-  ReadBook.findOne({
+  var readBook = this.readBook;
+  var book = this.book;
+  readBook.findOne({
     where: { user_id: id },
     inlcude: [{
-      model: Book
+      model: book
     }]
   }).then(book => {
-
     var data = JSON.parse(JSON.stringify(book));
-    console.log(data);
     var bookData = {
       id: data.book.id,
       name: data.book.name,
@@ -43,13 +47,15 @@ ReadBooks.prototype.getReadBook = function (id, callback) {
 };
 
 ReadBooks.prototype.getListUserBooks = function (userId, callback) {
-  ReadBook.findAll({
+  var readBook = this.readBook;
+  var book = this.book;
+  readBook.findAll({
       where: {user_id: userId, status: 'added'},
       order: [
-        [Book, 'name', 'ASC']
+        [book, 'name', 'ASC']
       ],
       include: [{
-        model: Book,
+        model: book,
         attributes: ['id', 'name', 'authors']
       }],
       attributes: ['book_id']

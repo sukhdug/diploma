@@ -2,16 +2,13 @@
 
 var Book = require('./../entity/Book');
 
-exports.Book = Book;
+function Books() {
+  this.book = new Book();
+}
 
-exports.getBook = function (id, callback) {
-  Book.findOne({where: {id: id}}).then(book => {
-    callback(book.name);
-  });
-};
-
-exports.getRandomBook = function (id, callback) {
-  Book.findOne({where: {id: id}}).then(book => {
+Books.prototype.getBook = function (id, callback) {
+  var book = this.book;
+  book.findOne({where: {id: id}}).then(book => {
     var bookData = {
       id: book.id,
       name: book.name,
@@ -27,8 +24,11 @@ exports.getRandomBook = function (id, callback) {
   });
 };
 
-exports.getCountOfBooks = function (callback) {
-  Book.count().then(count => {
+Books.prototype.getCountOfBooks = function (callback) {
+  var book = this.book;
+  book.count().then(count => {
     callback(count);
   });
 };
+
+module.exports = Books;

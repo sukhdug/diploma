@@ -65,8 +65,10 @@ module.exports = function(token, options) {
           func.showSavedBooks(chatId, 'liked');
           break;
         default:
-          bot.sendMessage(chatId, "I don't understand you, " + user + "! Sorry");
+          func.unknown(chatId);
       }
+    }).catch ( function () {
+      console.log('Error! Maybe, user send not text format message!');
     });
   }).catch(function () {
     exit('Error starting the Bot... maybe the TOKEN is wrong?');

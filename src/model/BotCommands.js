@@ -2,8 +2,15 @@
 
 var BotCommand = require('./../entity/BotCommand');
 
-exports.getCommandDescription = function(command, callback) {
-  BotCommand.findOne({where: {command: command}}).then(command => {
+function BotCommands() {
+  this.botCommand = new BotCommand();
+}
+
+BotCommands.prototype.getCommandDescription = function(command, callback) {
+  var botCommand = this.botCommand;
+  botCommand.findOne({where: {command: command}}).then(command => {
     callback(command.description);
   });
 };
+
+module.exports = BotCommands;

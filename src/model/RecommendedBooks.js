@@ -1,22 +1,30 @@
-'use strict'
+'use strict';
 
 var RecommendedBook = require('./../entity/RecommendedBook');
 var Book = require('./../entity/Book');
 
-exports.setRecommendBook = function (bookId, readerId, reviewId, userId, callback) {
+function RecommendedBooks() {
+  this.recommendedBook = new RecommendedBook();
+  this.book = new Book();
+}
+
+RecommendedBooks.prototype.setRecommendBook = function (bookId, readerId, reviewId, userId, callback) {
   var userChoose = 'recommend';
-  RecommendedBook.create({ book_id: bookId, reader_id: readerId, review_id: reviewId, user_id: userId, user_choose: userChoose })
+  var recommendedBook = this.recommendedBook;
+  recommendedBook.create({ book_id: bookId, reader_id: readerId, review_id: reviewId, user_id: userId, user_choose: userChoose })
   .then( result => {
     console.log(result.id);
     callback(result.id);
   });
 }
 
-exports.getRecommendedBook = function(id, callback) {
-  RecommendedBook.findOne({
+RecommendedBooks.prototype.getRecommendedBook = function(id, callback) {
+  var recommendedBook = this.recommendedBook;
+  var book = this.book;
+  recommendedBook.findOne({
     where: { id: id },
     include: [{
-      model: Book,
+      model: book,
       attributes: ['id', 'name', 'authors', 'genres', 'description', 'link']
     }]
   }).then(book => {
@@ -37,17 +45,22 @@ exports.getRecommendedBook = function(id, callback) {
   });
 }
 
-exports.updateRecommendedBookStatusToLike = function (id) {
+RecommendedBooks.prototype.updateRecommendedBookStatusToLike = function (id) {
+  var recommendedBook = this.recommendedBook;
   var userChoose = 'like';
-  RecommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
+  recommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
 }
 
-exports.updateRecommendedBookStatusToDislike = function (id) {
+RecommendedBooks.prototype.updateRecommendedBookStatusToDislike = function (id) {
+  var recommendedBook = this.recommendedBook;
   var userChoose = 'dislike';
-  RecommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
+  recommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
 }
 
-exports.updateRecommendedBookStatusToRead = function (id) {
+RecommendedBooks.prototype.updateRecommendedBookStatusToRead = function (id) {
+  var recommendedBook = this.recommendedBook;
   var userChoose = 'read';
-  RecommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
+  recommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
 }
+
+module.exports = RecommendedBooks;
