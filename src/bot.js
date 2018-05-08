@@ -5,8 +5,8 @@ var Functions = require('./bot_functions');
 
 // helper function -> exit with error
 var exit = function (msg) {
-    console.error(msg);
-    throw new Error(msg);
+  console.error(msg);
+  throw new Error(msg);
 };
 
 module.exports = function(token, options) {
@@ -93,8 +93,16 @@ module.exports = function(token, options) {
       if (action === 'prev') {
         func.showPrevSavedBooks(telegramOptions);
       }
+      if (action === 'like') {
 
-      //bot.editMessageText(text, opts);
+      }
+      if (action === 'read') {
+
+      }
+      if (action === 'dislike') {
+        func.editRecommendBook(telegramOptions, 'dislike');
+      }
+
     });
 
   }).catch(function () {

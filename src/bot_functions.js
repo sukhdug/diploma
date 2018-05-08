@@ -27,9 +27,13 @@ var reviews = new Reviews();
 // переменная хранит значение рандомного числа
 var randNumber = 0;
 
+// переменная хранит id рекомендованной книги
+var recommendBookId = 0;
+
 function BotFunctions(bot) {
   this.bot = bot;
   this.randBook = 0;
+  this.recommendBookId = 0;
   this.likedBooksOptions = {};
   this.readBooksOptions = {};
   this.booksArray = [];
@@ -77,12 +81,13 @@ function recommendBook(rand, chatId, callback) {
     global.recommendBookId = book.recommend_id;
     global.recommendBookReaderId = book.reader_id;
     global.recommendedBookBookId = book.id;
+    this.recommendBookId = book.id;
     var text = "<b>Название книги:</b> " + book.name +
       "\n<b>Автор:</b> " + book.authors + "\n<b>Жанры:</b> " + book.genres +
       "\n<b>Описание книги:</b>\n" + book.description +
       "\n<a href='" + book.link + "'>Читать рецензии на сайте LiveLib</a>";
     callback(text);
-    console.log(global.recommendBookReaderId);
+    //console.log(global.recommendBookReaderId);
   });
 }
 
@@ -134,7 +139,7 @@ BotFunctions.prototype.showRecommendation = function(chatId) {
       bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
     }, 1000);
   });
-  bot.on('callback_query', function (msg) {
+  /*bot.on('callback_query', function (msg) {
     var answer = msg.data.split('_');
     var index = answer[0];
     var messageId = msg.message.message_id - 1;
@@ -166,14 +171,38 @@ BotFunctions.prototype.showRecommendation = function(chatId) {
         });
       });
     }
-  });
+  });*/
+}
+
+BotFunctions.prototype.editRecommendBook = function(params, answer) {
+  if (answer === 'dislike') {
+    recommendedBooks.updateRecommendedBookStatusToDislike(global.recommendBookId);
+      //global.randomNumber = randomInt(1, 790);
+      randNumber = randomInt(1, 790);
+      Recommendation.findReviewOfDislikeBook(randNumber, function (bookId) {
+        recommendBook(bookId, chatId, function (text) {
+          bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: params.chat_id, parse_mode: "HTML"});
+        });
+      });
+  }
+  if (answer === 'read') {
+    readBooks.setBook(params.chat_id, this.recommendBookId);
+      recommendedBooks.updateRecommendedBookStatusToRead(global.recommendBookId);
+      //global.randomNumber = randomInt(1, 790);
+      randNumber = randomInt(1, 790);
+      Recommendation.findReviewOfDislikeBook(randNumber, function (bookId) {
+        recommendBook(bookId, chatId, function (text) {
+          bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
+        });
+      });
+  }
 }
 
 BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
   var object = null;
   var bot = this.bot;
   var savedBooksOptions = {};
-  var booksArray = [];
+  var booksArray;
   var howSaved = '';
   if (howSave == "liked") {
     object = new LikedBooks();
@@ -184,9 +213,10 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
   }
   object.getListUserBooks(chatId, function (books) {
     if (books == 'empty') {
+      console.log(books);
       bot.sendMessage(chatId, 'У Вас пока нет сохраненных книг в ' + howSaved);
     } else {
-      console.log(books);
+      booksArray = JSON.parse(JSON.stringify(books));
       var buttons = [
         [
           { text: "<<", callback_data: "prev"},
@@ -220,7 +250,7 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
   if (howSave == "liked") {
     this.howSaved = "понравившиеся";
     this.likedBooksOptions = savedBooksOptions;
-    this.likedBooksArray = global.booksArray;
+    this.likedBooksArray = booksArray;
   } else if (howSave == "read") {
     this.howSaved = "прочитанные";
     this.readBooksOptions = savedBooksOptions;

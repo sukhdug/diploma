@@ -8,7 +8,7 @@ var RecommendedBooks = require('./model/RecommendedBooks');
 
 var recommendedBooks = new RecommendedBooks();
 var review = new Review();
-
+/*
 exports.recommendedBook = function (bookId, readerId, reviewId, userId, callback) {
   recommendedBooks.setRecommendBook(bookId, readerId, reviewId, userId, function (result) {
     recommendedBooks.getRecommendedBook(result, function (book) {
@@ -37,3 +37,40 @@ exports.findReviewOfLikeBook = function(bookId, readerId, callback) {
     }
   });
 }
+*/
+function randomInt(min, max) {
+  var rand = min - 0.5 + Math.random() * (max - min + 1);
+  rand = Math.round(rand);
+  return rand;
+}
+
+function Recommendation() {
+}
+
+Recommendation.prototype.formRecommendBook = function (userId, callback) {
+  var rand = randomInt(1, 931);
+  var reviewId = rand;
+  recommendedBooks.checkExistRecommendedBookByReview(reviewId, userId, function (result) {
+    if (result === 'empty') {
+      review.getReview(rand, function (review) {
+        var reviewData = {
+          reviewId: review[0],
+          bookId: review[1],
+          readerId: review[2]
+        };
+        console.log(reviewData);
+        recommendedBooks.checkExistRecommendedBookByBook(reviewData.bookId, userId, function (result) {
+          if (result === 'empty') {
+            
+          } else if (result === 'exist') {
+            Recommendation.formRecommendBook();
+          }
+        });
+      });
+    } else if (result === 'exist') {
+      Recommendation.formRecommendBook();
+    }
+  });
+}
+
+module.exports = Recommendation;

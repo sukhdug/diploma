@@ -43,6 +43,32 @@ RecommendedBooks.prototype.getRecommendedBook = function(id, callback) {
   });
 }
 
+RecommendedBooks.prototype.checkExistRecommendedBookByReview = function (reviewId, userId, callback) {
+  recommendedBook.findOne({
+    where: { review_id: reviewId, user_id: userId }
+  }).then(book => {
+    if (book == null) {
+      callback('empty');
+    }
+    if (book != null) {
+      callback('exist');
+    }
+  });
+}
+
+RecommendedBooks.prototype.checkExistRecommendedBookByBook = function (bookId, userId, callback) {
+  recommendedBook.findOne({
+    where: { book_id: bookId, user_id: userId }
+  }).then(book => {
+    if (book == null) {
+      callback('empty');
+    }
+    if (book != null) {
+      callback('exist');
+    }
+  });
+}
+
 RecommendedBooks.prototype.updateRecommendedBookStatusToLike = function (id) {
   var userChoose = 'like';
   recommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
