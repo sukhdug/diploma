@@ -104,10 +104,13 @@ BotFunctions.prototype.showRecommendationBook = function(chatId) {
   ];
   var options = buildInlineKeyboards(buttons);
   recommendation.getRecommendBook(chatId, function (book) {
-    bot.sendMessage(chatId, book, { parse_mode: "HTML" });
-    setTimeout( function () {
-      bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
-    }, 1000);
+    var id = book.id;
+    var send = displayBook(id, function (text) {
+      bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+      setTimeout( function () {
+        bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
+      }, 1000);
+    });
   });
 }
 

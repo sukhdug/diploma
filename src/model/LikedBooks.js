@@ -31,7 +31,6 @@ LikedBooks.prototype.getLikedBook = function (id, callback) {
       model: book
     }]
   }).then(book => {
-
     var data = JSON.parse(JSON.stringify(book));
     console.log(data);
     var bookData = {
@@ -47,17 +46,16 @@ LikedBooks.prototype.getLikedBook = function (id, callback) {
 
 LikedBooks.prototype.getListUserBooks = function (userId, callback) {
   likedBook.findAll({
-      where: {user_id: userId, status: 'added'},
-      order: [
-        [book, 'name', 'ASC']
-      ],
-      include: [{
-        model: book,
-        attributes: ['id', 'name', 'authors']
-      }],
-      attributes: ['book_id']
-    })
-  .then(books => {
+    where: {user_id: userId, status: 'added'},
+    order: [
+      [book, 'name', 'ASC']
+    ],
+    include: [{
+      model: book,
+      attributes: ['id', 'name', 'authors']
+    }],
+    attributes: ['book_id']
+  }).then(books => {
     if (typeof books !== 'undefined' && books.length > 0) {
       var data = JSON.parse(JSON.stringify(books));
       var booksList = [];

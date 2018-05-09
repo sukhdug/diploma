@@ -68,6 +68,23 @@ RecommendedBooks.prototype.checkExistRecommendedBookByBook = function (bookId, u
   });
 }
 
+RecommendedBooks.prototype.getAllLikedBooksOfUser = function (userId, callback) {
+  recommendedBook.findAll({
+    where: { user_id: userId, user_choose: 'like' }
+  }).then(books => {
+    var bookArray = JSON.parse(JSON.stringify(books));
+    var bookData = [];
+    for (var i = 0; i < books.length; i++) {
+      bookData[i] = {
+        book_id: bookArray[i].book_id,
+        review_id: bookArray[i].review_id,
+        reader_id: bookArray[i].reader_id
+      }
+    }
+    callback(bookData);
+  });
+}
+
 RecommendedBooks.prototype.updateRecommendedBookStatusToLike = function (id) {
   var userChoose = 'like';
   recommendedBook.update({ user_choose: userChoose}, { where: { id: id}});

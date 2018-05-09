@@ -45,17 +45,16 @@ ReadBooks.prototype.getReadBook = function (id, callback) {
 
 ReadBooks.prototype.getListUserBooks = function (userId, callback) {
   readBook.findAll({
-      where: {user_id: userId, status: 'added'},
-      order: [
-        [book, 'name', 'ASC']
-      ],
-      include: [{
-        model: book,
-        attributes: ['id', 'name', 'authors']
-      }],
-      attributes: ['book_id']
-    })
-  .then(books => {
+    where: {user_id: userId, status: 'added'},
+    order: [
+      [book, 'name', 'ASC']
+    ],
+    include: [{
+      model: book,
+      attributes: ['id', 'name', 'authors']
+    }],
+    attributes: ['book_id']
+  }).then(books => {
     if (typeof books !== 'undefined' && books.length > 0) {
       var data = JSON.parse(JSON.stringify(books));
       var booksList = [];
