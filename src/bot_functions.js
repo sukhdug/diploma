@@ -23,6 +23,7 @@ var likedBooks = new LikedBooks();
 var readBooks = new ReadBooks();
 var recommendedBooks = new RecommendedBooks();
 var reviews = new Reviews();
+var recommendation = new Recommendation();
 
 // переменная хранит значение рандомного числа
 var randNumber = 0;
@@ -64,33 +65,6 @@ function getBotCommandDescription(command, callback) {
   });
 }
 
-function recommendation(rand, userId, callback) {
-  reviews.getReview(rand, function (review) {
-    console.log(review);
-    var reviewId = review[0];
-    var bookId = review[1];
-    var readerId = review[2];
-    Recommendation.recommendedBook(bookId, readerId, reviewId, userId, function (book) {
-      callback(book);
-    });
-  });
-}
-
-function recommendBook(rand, chatId, callback) {
-  recommendation(rand, chatId, function (book) {
-    global.recommendBookId = book.recommend_id;
-    global.recommendBookReaderId = book.reader_id;
-    global.recommendedBookBookId = book.id;
-    this.recommendBookId = book.id;
-    var text = "<b>Название книги:</b> " + book.name +
-      "\n<b>Автор:</b> " + book.authors + "\n<b>Жанры:</b> " + book.genres +
-      "\n<b>Описание книги:</b>\n" + book.description +
-      "\n<a href='" + book.link + "'>Читать рецензии на сайте LiveLib</a>";
-    callback(text);
-    //console.log(global.recommendBookReaderId);
-  });
-}
-
 function buildInlineKeyboards(buttons) {
   var options = {
     reply_markup: JSON.stringify({
@@ -118,11 +92,10 @@ BotFunctions.prototype.help = function(chatId) {
 
 BotFunctions.prototype.unknown = function(chatId) {
   var bot = this.bot;
-  bot.sendMessage(chatId, "К сожалению, бот не понимает Вас!" +
-                          " Чтобы просмотреть доступные команды, введите /help. Спасибо!");
+  bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
 }
 
-BotFunctions.prototype.showRecommendation = function(chatId) {
+BotFunctions.prototype.showRecommendationBook = function(chatId) {
   var bot = this.bot;
   var buttons = [
     [{ text: 'нравится', callback_data: 'like'}],
@@ -130,71 +103,12 @@ BotFunctions.prototype.showRecommendation = function(chatId) {
     [{ text: 'не нравится', callback_data: 'dislike'}]
   ];
   var options = buildInlineKeyboards(buttons);
-  var rand = randomInt(1, 790);
-  //global.randomNumber = rand;
-  randNumber = rand;
-  recommendBook(rand, chatId, function (text) {
-    bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+  recommendation.getRecommendBook(chatId, function (book) {
+    bot.sendMessage(chatId, book, { parse_mode: "HTML" });
     setTimeout( function () {
       bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
     }, 1000);
   });
-  /*bot.on('callback_query', function (msg) {
-    var answer = msg.data.split('_');
-    var index = answer[0];
-    var messageId = msg.message.message_id - 1;
-    if (index === 'dislike') {
-      recommendedBooks.updateRecommendedBookStatusToDislike(global.recommendBookId);
-      //global.randomNumber = randomInt(1, 790);
-      randNumber = randomInt(1, 790);
-      Recommendation.findReviewOfDislikeBook(randNumber, function (bookId) {
-        recommendBook(bookId, chatId, function (text) {
-          bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
-        });
-      });
-    } else if (index === 'read') {
-      readBooks.setBook(chatId, global.recommendedBookBookId);
-      recommendedBooks.updateRecommendedBookStatusToRead(global.recommendBookId);
-      //global.randomNumber = randomInt(1, 790);
-      randNumber = randomInt(1, 790);
-      Recommendation.findReviewOfDislikeBook(randNumber, function (bookId) {
-        recommendBook(bookId, chatId, function (text) {
-          bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
-        });
-      });
-    } else if (index === 'like') {
-      likedBooks.setBook(chatId, global.recommendedBookBookId);
-      recommendedBooks.updateRecommendedBookStatusToLike(global.recommendBookId);
-      Recommendation.findReviewOfLikeBook(global.recommendedBookBookId, global.recommendBookReaderId, function (bookId) {
-        recommendBook(bookId, chatId, function (text) {
-          bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
-        });
-      });
-    }
-  });*/
-}
-
-BotFunctions.prototype.editRecommendBook = function(params, answer) {
-  if (answer === 'dislike') {
-    recommendedBooks.updateRecommendedBookStatusToDislike(global.recommendBookId);
-      //global.randomNumber = randomInt(1, 790);
-      randNumber = randomInt(1, 790);
-      Recommendation.findReviewOfDislikeBook(randNumber, function (bookId) {
-        recommendBook(bookId, chatId, function (text) {
-          bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: params.chat_id, parse_mode: "HTML"});
-        });
-      });
-  }
-  if (answer === 'read') {
-    readBooks.setBook(params.chat_id, this.recommendBookId);
-      recommendedBooks.updateRecommendedBookStatusToRead(global.recommendBookId);
-      randNumber = randomInt(1, 790);
-      Recommendation.findReviewOfDislikeBook(randNumber, function (bookId) {
-        recommendBook(bookId, chatId, function (text) {
-          bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
-        });
-      });
-  }
 }
 
 BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
@@ -275,9 +189,10 @@ BotFunctions.prototype.showNextSavedBooks = function(params) {
     for (var i = 0; i < books.length; i++) {
       if (i === options.nextId && options.nextId === books.length - 1) {
         options.nextId = 0;
-        options.prevId = i - 2;
+        var j = Math.abs(i - 2);
+        options.prevId = j;
         options.next = books[0].id;
-        options.prev = books[i - 2].id;
+        options.prev = books[j].id;
         break;
       } if (i === options.nextId && options.nextId === 0) {
         options.nextId = i + 1;

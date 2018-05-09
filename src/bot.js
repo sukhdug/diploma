@@ -53,7 +53,7 @@ module.exports = function(token, options) {
           func.help(chatId);
           break;
         case '/recommendation':
-          func.showRecommendation(chatId);
+          func.showRecommendationBook(chatId);
           break;
         case '/random':
           func.showRandomBook(chatId);
@@ -76,7 +76,6 @@ module.exports = function(token, options) {
         message_id: msg.message_id,
       };
       let text;
-
       if (action === 'list') {
         text = 'Edited Text';
         bot.editMessageText(text, telegramOptions);

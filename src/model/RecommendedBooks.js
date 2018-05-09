@@ -38,7 +38,6 @@ RecommendedBooks.prototype.getRecommendedBook = function(id, callback) {
       description: bookArray.book.description,
       link: bookArray.book.link,
     }
-    console.log(bookData);
     callback(bookData);
   });
 }

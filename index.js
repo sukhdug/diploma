@@ -1,6 +1,6 @@
 'use strict';
 
-var token = '488077289:AAHu1Tv8ITPDnicBMkjQDiczFHFDLlfoa30',
+var token = '421083324:AAFfmcqVjwvczTiv8X_MKJHr07-JyFDcBJ4',
   options = {
     webHook: 0,
     port: 0

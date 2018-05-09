@@ -2,4 +2,4 @@ var Recommendation = require('./recommendation');
 
 var recommendation = new Recommendation();
 
-recommendation.formRecommendBook();
+recommendation.formRecommendBook(111);

@@ -8,36 +8,7 @@ var RecommendedBooks = require('./model/RecommendedBooks');
 
 var recommendedBooks = new RecommendedBooks();
 var review = new Review();
-/*
-exports.recommendedBook = function (bookId, readerId, reviewId, userId, callback) {
-  recommendedBooks.setRecommendBook(bookId, readerId, reviewId, userId, function (result) {
-    recommendedBooks.getRecommendedBook(result, function (book) {
-      callback(book);
-  	});
-  });
-}
 
-exports.findReviewOfDislikeBook = function(id, callback) {
-  review.getRandomReview(id, function (reviews) {
-	var rec_book = reviews[0];
-	callback(rec_book);
-  });
-}
-
-exports.findReviewOfLikeBook = function(bookId, readerId, callback) {
-  review.getReviewsOfReader(bookId, readerId, function (reviews) {
-    if (reviews !== 'error') {
-      var rec_book = reviews[0];
-      callback(rec_book);
-    } else if (reviews === 'error') {
-      review.getReviewsOfBook(bookId, readerId, function (reviews) {
-        var rec_book = reviews[0];
-        callback(rec_book);
-      });
-    }
-  });
-}
-*/
 function randomInt(min, max) {
   var rand = min - 0.5 + Math.random() * (max - min + 1);
   rand = Math.round(rand);
@@ -47,7 +18,7 @@ function randomInt(min, max) {
 function Recommendation() {
 }
 
-Recommendation.prototype.formRecommendBook = function (userId, callback) {
+Recommendation.prototype.getRecommendBook = function (userId, callback) {
   var rand = randomInt(1, 931);
   var reviewId = rand;
   recommendedBooks.checkExistRecommendedBookByReview(reviewId, userId, function (result) {
@@ -61,14 +32,24 @@ Recommendation.prototype.formRecommendBook = function (userId, callback) {
         console.log(reviewData);
         recommendedBooks.checkExistRecommendedBookByBook(reviewData.bookId, userId, function (result) {
           if (result === 'empty') {
-            
+            recommendedBooks.setRecommendBook(reviewData.bookId, reviewData.readerId, reviewData.reviewId, userId, function (id) {
+              recommendedBooks.getRecommendedBook(id, function (book) {
+                var text = "<b>Название книги:</b> " + book.name +
+                  "\n<b>Автор:</b> " + book.authors + "\n<b>Жанры:</b> " + book.genres +
+                  "\n<b>Описание книги:</b>\n" + book.description +
+                  "\n<a href='" + book.link + "'>Читать рецензии на сайте LiveLib</a>";
+                callback(text);
+              });
+            });
           } else if (result === 'exist') {
-            Recommendation.formRecommendBook();
+            console.log('exist');
+            //Recommendation.formRecommendBook();
           }
         });
       });
     } else if (result === 'exist') {
-      Recommendation.formRecommendBook();
+      console.log('exist');
+      //Recommendation.formRecommendBook();
     }
   });
 }
