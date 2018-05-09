@@ -188,7 +188,6 @@ BotFunctions.prototype.editRecommendBook = function(params, answer) {
   if (answer === 'read') {
     readBooks.setBook(params.chat_id, this.recommendBookId);
       recommendedBooks.updateRecommendedBookStatusToRead(global.recommendBookId);
-      //global.randomNumber = randomInt(1, 790);
       randNumber = randomInt(1, 790);
       Recommendation.findReviewOfDislikeBook(randNumber, function (bookId) {
         recommendBook(bookId, chatId, function (text) {
@@ -216,7 +215,7 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
       console.log(books);
       bot.sendMessage(chatId, 'У Вас пока нет сохраненных книг в ' + howSaved);
     } else {
-      booksArray = JSON.parse(JSON.stringify(books));
+      console.log(books);
       var buttons = [
         [
           { text: "<<", callback_data: "prev"},
@@ -250,109 +249,102 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
   if (howSave == "liked") {
     this.howSaved = "понравившиеся";
     this.likedBooksOptions = savedBooksOptions;
-    this.likedBooksArray = booksArray;
   } else if (howSave == "read") {
     this.howSaved = "прочитанные";
     this.readBooksOptions = savedBooksOptions;
-    this.readBooksArray = booksArray;
   }
-  /*bot.on('callback_query', function (msg) {
-    var answer = msg.data.split('_');
-    var callback = answer[0];
-    var messageId = msg.message.message_id - 1;
-    if (callback == 'prev') {
-      console.log(booksArray);
-      var func = displayBook(prev, function (text) {
-        bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
-        if (prevId == 0) {
-          next = booksArray[prevId].id;
-          nextId = prevId - 1;
-          prev = booksArray[booksArray.length - 1].id;
-          prevId = booksArray.length - 1;
-        } else {
-          next = booksArray[prevId].id;
-          nextId = prevId;
-          prev = booksArray[prevId - 1].id;
-          prevId = prevId - 1;
-        }
-      });
-    }
-    if (callback == 'next') {
-      var send = displayBook(next, function (text) {
-        bot.editMessageText(text, { message_id: messageId, chat_id: chatId , parse_mode: "HTML"});
-        if (nextId == booksArray.length - 1) {
-          prev = booksArray[booksArray.length - 1].id;
-          prevId = nextId;
-          next = booksArray[0].id;
-          nextId = 0;
-        } else {
-          prev = booksArray[nextId].id;
-          prevId = nextId;
-          next = booksArray[nextId + 1].id;
-          nextId = nextId + 1;
-        }
-      });
-    }
-  });*/
 }
 
 BotFunctions.prototype.showNextSavedBooks = function(params) {
+  var object = null;
   var bot = this.bot;
-  var books = [];
-  var array = {};
   var howSaved = this.howSaved;
-  if (howSaved === "понравившиеся") {
-    array = this.likedBooksOptions;
-    books = this.likedBooksArray;
+  var chatId = params.chat_id;
+  var options = {};
+  if (howSaved == 'прочитанные') {
+    object = new ReadBooks();
+    options = this.readBooksOptions;
   }
-  if (howSaved === "прочитанные") {
-    array = this.readBooksOptions;
-    books = this.readBooksArray;
+  if (howSaved == 'понравившиеся') {
+    object = new LikedBooks();
+    options = this.likedBooksOptions;
   }
-  console.log(books);
-  var send = displayBook(array.next, function (text) {
-    bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: params.chat_id, parse_mode: "HTML" });
-    if (array.nextId == books.length - 1) {
-      array.prev = books[books.length - 1].id;
-      array.prevId = array.nextId;
-      array.next = books[0].id;
-      array.nextId = 0;
-    } else {
-      array.prev = books[array.nextId].id;
-      array.prevId = array.nextId;
-      array.next = books[array.nextId + 1].id;
-      array.nextId = array.nextId + 1;
+  object.getListUserBooks(chatId, function (books) {
+    console.log(books);
+    var id = options.next;
+    for (var i = 0; i < books.length; i++) {
+      if (i === options.nextId && options.nextId === books.length - 1) {
+        options.nextId = 0;
+        options.prevId = i - 2;
+        options.next = books[0].id;
+        options.prev = books[i - 2].id;
+        break;
+      } if (i === options.nextId && options.nextId === 0) {
+        options.nextId = i + 1;
+        options.prevId = books.length - 1;
+        options.next = books[i + 1].id;
+        options.prev = books[books.length - 1].id;
+        break;
+      } else if (i === options.nextId) {
+        options.nextId = i + 1;
+        options.prevId = i - 1;
+        options.next = books[i + 1].id;
+        options.prev = books[i - 1].id;
+        break;
+      }
     }
+    var send = displayBook(id, function (text) {
+        bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: chatId, parse_mode: "HTML" });
+      });
   });
+  if (howSaved == 'прочитанные') this.readBooksOptions = options;
+  if (howSaved == 'понравившиеся') this.likedBooksOptions = options;
 }
 
 BotFunctions.prototype.showPrevSavedBooks = function(params) {
+  var object = null;
   var bot = this.bot;
-  var books = this.booksArray;
-  var array = {};
   var howSaved = this.howSaved;
-  console.log(howSaved);
-  if (howSaved === "понравившиеся") {
-    array = this.likedBooksOptions;
+  var chatId = params.chat_id;
+  var options = {};
+  if (howSaved == 'прочитанные') {
+    object = new ReadBooks();
+    options = this.readBooksOptions;
   }
-  if (howSaved === "прочитанные") {
-    array = this.readBooksOptions;
+  if (howSaved == 'понравившиеся') {
+    object = new LikedBooks();
+    options = this.likedBooksOptions;
   }
-  console.log(array);
-  var send = displayBook(array.next, function (text) {
-    bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: params.chat_id, parse_mode: "HTML" });
-    if (array.prevId == 0) {
-      array.next = books[array.prevId].id;
-      array.nextId = prevId - 1;
-      array.prev = books[array.length - 1].id;
-      array.prevId = books.length - 1;
-    } else {
-      array.next = books[array.prevId].id;
-      array.nextId = array.prevId;
-      array.prev = books[array.prevId - 1].id;
-      array.prevId = array.prevId - 1;
+  object.getListUserBooks(chatId, function (books) {
+    console.log(books);
+    var id = options.prev;
+    for (var i = 0; i < books.length; i++) {
+      if (i === options.prevId && options.prevId === 0) {
+        options.nextId = i + 1;
+        options.prevId = books.length - 1;
+        options.next = books[i + 1].id;
+        options.prev = books[books.length - 1].id;
+        break;
+      } if (i === options.prevId && options.prevId === books.length - 1) {
+        options.nextId = 0;
+        options.prevId = i - 1;
+        options.next = books[0].id;
+        options.prev = books[i - 1].id;
+        break;
+      } else if (i === options.prevId) {
+        options.nextId = i + 1;
+        options.prevId = i - 1;
+        options.next = books[i + 1].id;
+        options.prev = books[i - 1].id;
+        break;
+      }
     }
+    var send = displayBook(id, function (text) {
+        bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: chatId, parse_mode: "HTML" });
+      });
   });
+  if (howSaved == 'прочитанные') this.readBooksOptions = options;
+  if (howSaved == 'понравившиеся') this.likedBooksOptions = options;
 }
 
 BotFunctions.prototype.showRandomBook = function(chatId) {
