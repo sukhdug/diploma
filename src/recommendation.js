@@ -19,7 +19,7 @@ function randomInt(min, max) {
 function Recommendation() {
 }
 
-Recommendation.prototype.getRecommendBook = function (userId, callback) {
+Recommendation.prototype.getRecommendBook = function (userId, messageId, callback) {
   var rand = randomInt(1, 931);
   var reviewId = rand;
   recommendedBooks.checkExistRecommendedBookByReview(reviewId, userId, function (result) {
@@ -32,7 +32,7 @@ Recommendation.prototype.getRecommendBook = function (userId, callback) {
         };
         recommendedBooks.checkExistRecommendedBookByBook(reviewData.bookId, userId, function (result) {
           if (result === 'empty') {
-            recommendedBooks.setRecommendBook(reviewData.bookId, reviewData.readerId, reviewData.reviewId, userId, function (id) {
+            recommendedBooks.setRecommendBook(reviewData.bookId, reviewData.readerId, reviewData.reviewId, userId, messageId, function (id) {
               recommendedBooks.getRecommendedBook(id, function (book) {
                 callback(book);
               });

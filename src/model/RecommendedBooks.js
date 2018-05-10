@@ -9,9 +9,9 @@ var book = Book;
 function RecommendedBooks() {
 }
 
-RecommendedBooks.prototype.setRecommendBook = function (bookId, readerId, reviewId, userId, callback) {
+RecommendedBooks.prototype.setRecommendBook = function (bookId, readerId, reviewId, userId, messageId, callback) {
   var userChoose = 'recommend';
-  recommendedBook.create({ book_id: bookId, reader_id: readerId, review_id: reviewId, user_id: userId, user_choose: userChoose })
+  recommendedBook.create({ book_id: bookId, reader_id: readerId, review_id: reviewId, user_id: userId, message_id: messageId, user_choose: userChoose })
   .then( result => {
     console.log(result.id);
     callback(result.id);
@@ -89,19 +89,8 @@ RecommendedBooks.prototype.getAllLikedBooksOfUser = function (userId, callback) 
   });
 }
 
-RecommendedBooks.prototype.updateRecommendedBookStatusToLike = function (id) {
-  var userChoose = 'like';
-  recommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
-}
-
-RecommendedBooks.prototype.updateRecommendedBookStatusToDislike = function (id) {
-  var userChoose = 'dislike';
-  recommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
-}
-
-RecommendedBooks.prototype.updateRecommendedBookStatusToRead = function (id) {
-  var userChoose = 'read';
-  recommendedBook.update({ user_choose: userChoose}, { where: { id: id}});
+RecommendedBooks.prototype.updateRecommendedBookStatus = function (userId, messageId, status) {
+  recommendedBook.update({ user_choose: status}, { where: { user_id: userId, message_id: messageId }});
 }
 
 module.exports = RecommendedBooks;

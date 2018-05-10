@@ -33,6 +33,11 @@ var RecommendedBook = sequelize.define('recommended_books', {
     notEmpty: true,
     isInt: true
   },
+  message_id: {
+    type: Sequelize.INTEGER,
+    notEmpty: true,
+    isInt: true
+  },
   user_choose: {
     type: Sequelize.STRING,
     validate: {

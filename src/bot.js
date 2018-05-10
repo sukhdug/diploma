@@ -47,39 +47,52 @@ module.exports = function(token, options) {
       var user = msg.chat.username;
       switch (command) {
         case '/start':
-          func.welcome(user, chatId, function (res) {
+          func.getCommandResult('start', function (res) {
             bot.sendMessage(chatId, res, { parse_mode: "HTML" });
           });
           break;
         case '/help':
-          func.help(chatId, function (res) {
-            bot.sendMessage(chatId, res, { parse_mode: "HTML:" });
+          func.getCommandResult('help', function (res) {
+            console.log(msg);
+            bot.sendMessage(chatId, res, { parse_mode: "HTML" });
           });
           break;
         case '/recommendation':
-          func.getRecommendationBook(chatId, function (res) {
+          var messageId = msg.message_id + 1;
+          func.getRecommendationBook(chatId, messageId, function (res) {
             bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-            bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", res.buttons);
+            setTimeout( function () {
+              bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", res.buttons);
+            }, 1000);
           });
           break;
         case '/random':
           func.getRandomBook(chatId, function (res) {
             bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-            bot.sendMessage(chatId, "Выберите один из вариантов", res.buttons);
+            setTimeout( function() {
+              bot.sendMessage(chatId, "Выберите один из вариантов", res.buttons);
+            });
           });
           break;
         case '/read':
-          func.getSavedBooks(chatId, 'read', function (res) {
-            bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+          var messageId = msg.message_id + 1;
+          func.getSavedBooks(chatId, messageId, 'read', function (res) {
+            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+            setTimeout( function() {
+              bot.sendMessage(chatId, "Выберите прочитанные книги", res.buttons);
+            });
           });
           break;
         case '/like':
-          func.getSavedBooks(chatId, 'liked', function (res) {
-            bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+          var messageId = msg.message_id + 1;
+          func.getSavedBooks(chatId, messageId, 'liked', function (res) {
+            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+            setTimeout( function() {
+              bot.sendMessage(chatId, "Ваши понравившиеся книг", res.buttons);
+            });
           });
           break;
         default:
-          //func.unknown(chatId);
           bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
       }
     });
@@ -102,10 +115,14 @@ module.exports = function(token, options) {
         func.setToReadRandomBook(telegramOptions);
       }
       if (action === 'next') {
-        func.showNextSavedBooks(telegramOptions);
+        func.showNextSavedBooks(telegramOptions, function (res) {
+          bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
+        });
       }
       if (action === 'prev') {
-        func.showPrevSavedBooks(telegramOptions);
+        func.showPrevSavedBooks(telegramOptions, function (res) {
+          bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
+        });
       }
       if (action === 'like') {
 
