@@ -9,12 +9,6 @@ var BotCommands = require('./model/BotCommands');
 var Recommendation = require('./recommendation');
 var RecommendedBooks = require('./model/RecommendedBooks');
 
-global.randomNumber = 0;
-global.recommendBookId = 0;
-global.recommendBookReaderId = 0;
-global.recommendedBookBookId = 0;
-global.bookId = 0; // ID рекомендованной книги
-
 // создаем экземпляры моделей
 var books = new Books();
 var botCommands = new BotCommands();
@@ -25,28 +19,18 @@ var recommendedBooks = new RecommendedBooks();
 var reviews = new Reviews();
 var recommendation = new Recommendation();
 
-// переменная хранит значение рандомного числа
-var randNumber = 0;
-
-// переменная хранит id рекомендованной книги
-var recommendBookId = 0;
-
-function BotFunctions(bot) {
-  this.bot = bot;
-  this.randBook = 0;
-  this.recommendBookId = 0;
-  this.likedBooksOptions = {};
-  this.readBooksOptions = {};
-  this.booksArray = [];
-  this.readBooksArray = [];
-  this.likedBooksArray = [];
-  this.howSaved = [];
+function BotFunctions() {
+  this._randBook = 0;
+  this._recommendBookId = 0;
+  this._likedBooksOptions = {};
+  this._readBooksOptions = {};
+  this._howSaved = [];
 }
 
 function randomInt(min, max) {
-  var rand = min - 0.5 + Math.random() * (max - min + 1);
-  rand = Math.round(rand);
-  return rand;
+  var num = min - 0.5 + Math.random() * (max - min + 1);
+  num = Math.round(rand);
+  return num;
 }
 
 function displayBook(id, callback) {
@@ -70,13 +54,16 @@ function buildInlineKeyboards(buttons) {
 }
 
 BotFunctions.prototype.getCommandResult = function(command, callback) {
-  botCommands.getCommandDescription(command, (description) => {
-    callback(description);
+  botCommands.getCommandDescription(command, (req, res) => {
+    if (req) {
+      callback(new Error("500 Server Error"));
+    } else {
+      callback(null, res);
+    }
   });
 }
 
 BotFunctions.prototype.getRecommendationBook = function(userId, messageId, callback) {
-  var bot = this.bot;
   var buttons = [
     [{ text: 'нравится', callback_data: 'like'}],
     [{ text: 'читал (а)', callback_data: 'read'}],
@@ -97,9 +84,8 @@ BotFunctions.prototype.getRecommendationBook = function(userId, messageId, callb
 
 BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, callback) {
   var object = null;
-  var bot = this.bot;
   var savedBooksOptions = {};
-  this.howSaved.push({
+  this._howSaved.push({
     how_save: howSave,
     user_id: chatId,
     message_id: messageId
@@ -144,9 +130,9 @@ BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, call
     }
   });
   if (howSave == "liked") {
-    this.likedBooksOptions = savedBooksOptions;
+    this._likedBooksOptions = savedBooksOptions;
   } else if (howSave == "read") {
-    this.readBooksOptions = savedBooksOptions;
+    this._readBooksOptions = savedBooksOptions;
   }
 }
 
@@ -155,18 +141,18 @@ BotFunctions.prototype.showNextSavedBooks = function(params, callback) {
   var chatId = params.chat_id;
   var options = {};
   var howSaved;
-  console.log(this.howSaved);
-  console.log(this.howSaved.length);
-  for (var i = 0; i < this.howSaved.length; i++) {
-    if (this.howSaved[i].user_id === params.chat_id && this.howSaved[i].message_id === params.message_id - 1) {
-      if (this.howSaved[i].how_save === "liked") {
+  console.log(this._howSaved);
+  console.log(this._howSaved.length);
+  for (var i = 0; i < this._howSaved.length; i++) {
+    if (this._howSaved[i].user_id === params.chat_id && this._howSaved[i].message_id === params.message_id - 1) {
+      if (this._howSaved[i].how_save === "liked") {
         object = new LikedBooks();
-        options = this.likedBooksOptions;
+        options = this._likedBooksOptions;
         howSaved = 'liked';
       }
-      if (this.howSaved[i].how_save === "read") {
+      if (this._howSaved[i].how_save === "read") {
         object = new ReadBooks();
-        options = this.readBooksOptions;
+        options = this._readBooksOptions;
         howSaved = 'read';
       }
     }
@@ -200,8 +186,8 @@ BotFunctions.prototype.showNextSavedBooks = function(params, callback) {
       callback(text);
     });
   });
-  if (howSaved == 'read') this.readBooksOptions = options;
-  if (howSaved == 'liked') this.likedBooksOptions = options;
+  if (howSaved == 'read') this._readBooksOptions = options;
+  if (howSaved == 'liked') this._likedBooksOptions = options;
 }
 
 BotFunctions.prototype.showPrevSavedBooks = function(params, callback) {
@@ -209,18 +195,16 @@ BotFunctions.prototype.showPrevSavedBooks = function(params, callback) {
   var chatId = params.chat_id;
   var options = {};
   var howSaved;
-  console.log(this.howSaved);
-  console.log(this.howSaved.length);
-  for (var i = 0; i < this.howSaved.length; i++) {
-    if (this.howSaved[i].user_id === params.chat_id && this.howSaved[i].message_id === params.message_id - 1) {
-      if (this.howSaved[i].how_save === "liked") {
+  for (var i = 0; i < this._howSaved.length; i++) {
+    if (this._howSaved[i].user_id === params.chat_id && this._howSaved[i].message_id === params.message_id - 1) {
+      if (this._howSaved[i].how_save === "liked") {
         object = new LikedBooks();
-        options = this.likedBooksOptions;
+        options = this._likedBooksOptions;
         howSaved = 'liked';
       }
-      if (this.howSaved[i].how_save === "read") {
+      if (this._howSaved[i].how_save === "read") {
         object = new ReadBooks();
-        options = this.readBooksOptions;
+        options = this._readBooksOptions;
         howSaved = 'read';
       }
     }
@@ -252,12 +236,11 @@ BotFunctions.prototype.showPrevSavedBooks = function(params, callback) {
       callback(text);
     });
   });
-  if (howSaved == 'read') this.readBooksOptions = options;
-  if (howSaved == 'liked') this.likedBooksOptions = options;
+  if (howSaved == 'read') this._readBooksOptions = options;
+  if (howSaved == 'liked') this._likedBooksOptions = options;
 }
 
 BotFunctions.prototype.getRandomBook = function(chatId, callback) {
-  var bot =  this.bot;
   var readBooks = new ReadBooks();
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
@@ -268,7 +251,7 @@ BotFunctions.prototype.getRandomBook = function(chatId, callback) {
   var addedToRead = 0;
   var addedToSave = 0;
   var rand = randomInt(1, 422);
-  this.randBook = rand;
+  this._randBook = rand;
   var send = displayBook(rand, function (text) {
     var getData = {
       text: text,
@@ -278,8 +261,7 @@ BotFunctions.prototype.getRandomBook = function(chatId, callback) {
   });
 }
 
-BotFunctions.prototype.editRandomBook = function(params) {
-  var bot =  this.bot;
+BotFunctions.prototype.editRandomBook = function(params, callback) {
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
     [{ text: "сохранить", callback_data: "save"},
@@ -287,18 +269,20 @@ BotFunctions.prototype.editRandomBook = function(params) {
   ];
   var options = buildInlineKeyboards(buttons);
   var rand = randomInt(1, 422);
-  this.randBook = rand;
-  var send = displayBook(rand, function (text) {
-    bot.editMessageText(text, { message_id: params.message_id - 1, chat_id: params.chat_id , parse_mode: "HTML"});
+  this._randBook = rand;
+  var addedToRead = this.addedToRead;
+  displayBook(rand, function (text) {
+    var data = {
+      text: text,
+      buttons: options,
+      read: (addedToRead === 1 ? true : false)
+    }
+    callback(data);
   });
-  if (this.addedToRead == 1) {
-    bot.editMessageReplyMarkup( options.reply_markup, { message_id: params.message_id, chat_id: params.chat_id });
-    this.addedToRead = 0;
-  }
+  this.addedToRead = 0;
 }
 
-BotFunctions.prototype.setToReadRandomBook = function(params) {
-  var bot =  this.bot;
+BotFunctions.prototype.setToReadRandomBook = function(params, callback) {
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
     [{ text: "сохранить", callback_data: "save" }],
@@ -306,10 +290,10 @@ BotFunctions.prototype.setToReadRandomBook = function(params) {
   ];
   var options = buildInlineKeyboards(buttons);
   this.addedToRead = 1;
-  var bookId = this.randBook;
+  var bookId = this._randBook;
   readBooks.setBook(params.chat_id, bookId);
   var options = buildInlineKeyboards(buttons);
-  bot.editMessageReplyMarkup( options.reply_markup, { message_id: params.message_id, chat_id: params.chat_id });
+  callback(options);
 }
 
 module.exports = BotFunctions;

@@ -12,15 +12,17 @@ var exit = function (msg) {
 module.exports = function(token, options) {
   options = options || {};
 
-  // check variables
+  // проверка, задан токен бота или нет
   if (!token) {
     exit('Please add a TOKEN env variable with the TelegramBot token');
   }
 
   // check if the bot should use a webHook
+  // проверка, если бот будет работать в режиме webHook
   var webHook = options.webHook;
 
   // set bot mode (polling vs webHook) depending ok the environment
+  // здесь задаем, в каком режиме (polling vs webHook) будет работать бот
   var botOptions = {};
   if (webHook) {
     botOptions.webHook = {
@@ -36,8 +38,9 @@ module.exports = function(token, options) {
   if (webHook) {
     bot.setWebHook(webHook + ':443/bot' + token);
   }
-
-  var func = new Functions(bot);
+  // В Functions() находятся все функции, которые возвращают callbackом
+  // все данные, необходимые для отправки сообщений пользователю
+  var func = new Functions();
 
   bot.getMe().then( function (me) {
     var botName =  '@' + me.username;
@@ -47,14 +50,23 @@ module.exports = function(token, options) {
       var user = msg.chat.username;
       switch (command) {
         case '/start':
-          func.getCommandResult('start', function (res) {
-            bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+          func.getCommandResult('start', function (req, res) {
+            if (req) {
+              console.log(req);
+              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+            } else {
+              bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+            }
           });
           break;
         case '/help':
-          func.getCommandResult('help', function (res) {
-            console.log(msg);
-            bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+          func.getCommandResult('help', function (req, res) {
+            if (req) {
+              console.log(req);
+              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+            } else {
+              bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+            }
           });
           break;
         case '/recommendation':
@@ -71,7 +83,7 @@ module.exports = function(token, options) {
             bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
             setTimeout( function() {
               bot.sendMessage(chatId, "Выберите один из вариантов", res.buttons);
-            });
+            }, 1000);
           });
           break;
         case '/read':
@@ -109,10 +121,17 @@ module.exports = function(token, options) {
         bot.editMessageText(text, telegramOptions);
       }
       if (action === 'other') {
-        func.editRandomBook(telegramOptions);
+        func.editRandomBook(telegramOptions, function (res) {
+          bot.editMessageText(res.text, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
+          if (res.read) {
+            bot.editMessageReplyMarkup( res.buttons.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
+          }
+        });
       }
       if (action === 'imread') {
-        func.setToReadRandomBook(telegramOptions);
+        func.setToReadRandomBook(telegramOptions, function (res) {
+          bot.editMessageReplyMarkup( res.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
+        });
       }
       if (action === 'next') {
         func.showNextSavedBooks(telegramOptions, function (res) {

@@ -8,8 +8,10 @@ function BotCommands() {
 }
 
 BotCommands.prototype.getCommandDescription = function(command, callback) {
-  botCommand.findOne({where: {command: command}}).then(command => {
-    callback(command.description);
+  botCommand.findOne({where: {command: command}}).then( function (command) {
+    callback(null, command.description);
+  }).catch( function (err) {
+    callback(new Error("Server problem"));
   });
 };
 
