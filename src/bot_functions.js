@@ -59,12 +59,6 @@ function displayBook(id, callback) {
   });
 }
 
-function getBotCommandDescription(command, callback) {
-  botCommands.getCommandDescription(command, (description) => {
-    callback(description);
-  });
-}
-
 function buildInlineKeyboards(buttons) {
   var options = {
     reply_markup: JSON.stringify({
@@ -75,27 +69,27 @@ function buildInlineKeyboards(buttons) {
   return options;
 }
 
-BotFunctions.prototype.welcome = function(user, chatId) {
-  var bot = this.bot;
-  getBotCommandDescription('start', function (description) {
-    bot.sendMessage(chatId, description, { parse_mode: "HTML"});
+BotFunctions.prototype.welcome = function(user, chatId, callback) {
+  //var bot = this.bot;
+  botCommands.getCommandDescription('start', (description) => {
+    callback(description);
   });
   users.setUser(user, chatId);
 }
 
-BotFunctions.prototype.help = function(chatId) {
-  var bot = this.bot;
-  getBotCommandDescription('help', function (description) {
-    bot.sendMessage(chatId, description, { parse_mode: "HTML" });
+BotFunctions.prototype.help = function(chatId, callback) {
+  //var bot = this.bot;
+  botCommands.getCommandDescription('help', (description) => {
+    callback(description);
   });
 }
 
 BotFunctions.prototype.unknown = function(chatId) {
-  var bot = this.bot;
-  bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
+  //var bot = this.bot;
+  //bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
 }
 
-BotFunctions.prototype.showRecommendationBook = function(chatId) {
+BotFunctions.prototype.getRecommendationBook = function(chatId, callback) {
   var bot = this.bot;
   var buttons = [
     [{ text: 'нравится', callback_data: 'like'}],
@@ -105,16 +99,21 @@ BotFunctions.prototype.showRecommendationBook = function(chatId) {
   var options = buildInlineKeyboards(buttons);
   recommendation.getRecommendBook(chatId, function (book) {
     var id = book.id;
-    var send = displayBook(id, function (text) {
-      bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+    displayBook(id, function (text) {
+      var getData = {
+        text: text,
+        buttons: options
+      }
+      callback(getData);
+      /*bot.sendMessage(chatId, text, { parse_mode: "HTML" });
       setTimeout( function () {
         bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", options);
-      }, 1000);
+      }, 1000);*/
     });
   });
 }
 
-BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
+BotFunctions.prototype.getSavedBooks = function(chatId, howSave, callback) {
   var object = null;
   var bot = this.bot;
   var savedBooksOptions = {};
@@ -153,13 +152,14 @@ BotFunctions.prototype.showSavedBooks = function(chatId, howSave) {
           savedBooksOptions.prevId = i;
         }
       }
-      var send = displayBook(id, function (text) {
-        bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+      displayBook(id, function (text) {
+        callback(text);
+        /*bot.sendMessage(chatId, text, { parse_mode: "HTML" });
         if (savedBooksOptions.booksLength > 1) {
           setTimeout( function () {
             bot.sendMessage(chatId, "Ваши " + howSaved + " книги", options);
           }, 1000);
-        }
+        }*/
       });
     }
   });
@@ -265,7 +265,7 @@ BotFunctions.prototype.showPrevSavedBooks = function(params) {
   if (howSaved == 'понравившиеся') this.likedBooksOptions = options;
 }
 
-BotFunctions.prototype.showRandomBook = function(chatId) {
+BotFunctions.prototype.getRandomBook = function(chatId, callback) {
   var bot =  this.bot;
   var readBooks = new ReadBooks();
   var buttons = [
@@ -279,10 +279,15 @@ BotFunctions.prototype.showRandomBook = function(chatId) {
   var rand = randomInt(1, 422);
   this.randBook = rand;
   var send = displayBook(rand, function (text) {
-    bot.sendMessage(chatId, text, { parse_mode: "HTML" });
+    var getData = {
+      text: text,
+      buttons: options
+    }
+    callback(getData);
+    /*bot.sendMessage(chatId, text, { parse_mode: "HTML" });
     setTimeout( function () {
       bot.sendMessage(chatId, "Выберите", options);
-    }, 1000);
+    }, 1000);*/
   });
 }
 

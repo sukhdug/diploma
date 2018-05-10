@@ -72,16 +72,20 @@ RecommendedBooks.prototype.getAllLikedBooksOfUser = function (userId, callback) 
   recommendedBook.findAll({
     where: { user_id: userId, user_choose: 'like' }
   }).then(books => {
-    var bookArray = JSON.parse(JSON.stringify(books));
-    var bookData = [];
-    for (var i = 0; i < books.length; i++) {
-      bookData[i] = {
-        book_id: bookArray[i].book_id,
-        review_id: bookArray[i].review_id,
-        reader_id: bookArray[i].reader_id
+    if (typeof books !== 'undefined' && books.length > 0) {
+      var bookArray = JSON.parse(JSON.stringify(books));
+      var bookData = [];
+      for (var i = 0; i < books.length; i++) {
+        bookData[i] = {
+          book_id: bookArray[i].book_id,
+          review_id: bookArray[i].review_id,
+          reader_id: bookArray[i].reader_id
+        }
       }
+      callback(bookData);
+    } else {
+      callback('empty');
     }
-    callback(bookData);
   });
 }
 

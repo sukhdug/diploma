@@ -47,25 +47,40 @@ module.exports = function(token, options) {
       var user = msg.chat.username;
       switch (command) {
         case '/start':
-          func.welcome(user, chatId);
+          func.welcome(user, chatId, function (res) {
+            bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+          });
           break;
         case '/help':
-          func.help(chatId);
+          func.help(chatId, function (res) {
+            bot.sendMessage(chatId, res, { parse_mode: "HTML:" });
+          });
           break;
         case '/recommendation':
-          func.showRecommendationBook(chatId);
+          func.getRecommendationBook(chatId, function (res) {
+            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+            bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", res.buttons);
+          });
           break;
         case '/random':
-          func.showRandomBook(chatId);
+          func.getRandomBook(chatId, function (res) {
+            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+            bot.sendMessage(chatId, "Выберите один из вариантов", res.buttons);
+          });
           break;
         case '/read':
-          func.showSavedBooks(chatId, 'read');
+          func.getSavedBooks(chatId, 'read', function (res) {
+            bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+          });
           break;
         case '/like':
-          func.showSavedBooks(chatId, 'liked');
+          func.getSavedBooks(chatId, 'liked', function (res) {
+            bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+          });
           break;
         default:
-          func.unknown(chatId);
+          //func.unknown(chatId);
+          bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
       }
     });
     bot.on('callback_query', function (callbackQuery) {
