@@ -88,20 +88,30 @@ module.exports = function(token, options) {
           break;
         case '/read':
           var messageId = msg.message_id + 1;
-          func.getSavedBooks(chatId, messageId, 'read', function (res) {
-            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-            setTimeout( function() {
-              bot.sendMessage(chatId, "Выберите прочитанные книги", res.buttons);
-            });
+          func.getSavedBooks(chatId, messageId, 'read', function (req, res) {
+            if (req) {
+              console.log(req);
+              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+            } else {
+              bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+              setTimeout( function() {
+                bot.sendMessage(chatId, "Выберите прочитанные книги", res.buttons);
+              }, 1000);
+            }
           });
           break;
         case '/like':
           var messageId = msg.message_id + 1;
-          func.getSavedBooks(chatId, messageId, 'liked', function (res) {
-            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-            setTimeout( function() {
-              bot.sendMessage(chatId, "Ваши понравившиеся книг", res.buttons);
-            });
+          func.getSavedBooks(chatId, messageId, 'liked', function (req, res) {
+            if (req) {
+              console.log(req);
+              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+            } else {
+              bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+              setTimeout( function() {
+                bot.sendMessage(chatId, "Ваши понравившиеся книг", res.buttons);
+              }, 1000);
+            }
           });
           break;
         default:
@@ -134,13 +144,23 @@ module.exports = function(token, options) {
         });
       }
       if (action === 'next') {
-        func.showNextSavedBooks(telegramOptions, function (res) {
-          bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
+        func.showNextSavedBooks(telegramOptions, function (req, res) {
+          if (req) {
+            console.log(req);
+            bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+          } else {
+            bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
+          }
         });
       }
       if (action === 'prev') {
-        func.showPrevSavedBooks(telegramOptions, function (res) {
-          bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
+        func.showPrevSavedBooks(telegramOptions, function (req, res) {
+          if (req) {
+            console.log(req);
+            bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+          } else {
+            bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
+          }
         });
       }
       if (action === 'like') {

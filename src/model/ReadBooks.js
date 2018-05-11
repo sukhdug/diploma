@@ -12,15 +12,18 @@ function ReadBooks() {
 ReadBooks.prototype.setBook = function (userId, bookId) {
   readBook.findOrCreate({ where: { user_id: userId, book_id: bookId, status: 'added'}})
   .spread((book, created) => {
-    console.log(book.get());
     console.log(created);
+  }).catch( function (err) {
+    callback(new Error("Server problem"));
   });
 };
 
 ReadBooks.prototype.getReadBookId = function (id, callback) {
   readBook.findOne({where: {book_id: id}, attributes: ['id']}).then(book => {
     var id = JSON.parse(JSON.stringify(book));
-    callback(id);
+    callback(null, id);
+  }).catch( function (err) {
+    callback(new Error("Server problem"));
   });
 };
 
@@ -39,7 +42,9 @@ ReadBooks.prototype.getReadBook = function (id, callback) {
       genres: data.book.genres,
       description: data.book.description,
     }
-    callback(bookData);
+    callback(null, bookData);
+  }).catch( function (err) {
+    callback(new Error("Server problem"));
   });
 };
 
@@ -61,10 +66,12 @@ ReadBooks.prototype.getListUserBooks = function (userId, callback) {
       for (var i = 0; i < data.length; i++) {
         booksList[i] = data[i].book;
       }
-      callback(booksList);
+      callback(null, booksList);
     } else {
-      callback('empty');
+      callback(null, 'empty');
     }
+  }).catch( function (err) {
+    callback(new Error("Server problem"));
   });
 }
 

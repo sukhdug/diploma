@@ -95,38 +95,42 @@ BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, call
   } else if (howSave == "read") {
     object = new ReadBooks();
   }
-  object.getListUserBooks(chatId, function (books) {
-    if (books == 'empty') {
-      console.log(books);
-      var empty = "У Вас пока нет сохраненных книг в ";
-      callback(empty);
+  object.getListUserBooks(chatId, function (err, books) {
+    if (err) {
+      callback(new Error("500 Server Error"));
     } else {
-      var buttons = [
-        [
-          { text: "<<", callback_data: "prev"},
-          { text: "список", callback_data: "list" },
-          { text: ">>", callback_data: "next"}
-        ]
-      ];
-      var options = buildInlineKeyboards(buttons);
-      var id = books[0].id;
-      for (var i = 0; i < books.length; i++) {
-        if (i == 1) {
-          savedBooksOptions.next = books[i].id;
-          savedBooksOptions.nextId = i;
+      if (books == 'empty') {
+        console.log(books);
+        var empty = "У Вас пока нет сохраненных книг в ";
+        callback(empty);
+      } else {
+        var buttons = [
+          [
+            { text: "<<", callback_data: "prev"},
+            { text: "список", callback_data: "list" },
+            { text: ">>", callback_data: "next"}
+          ]
+        ];
+        var options = buildInlineKeyboards(buttons);
+        var id = books[0].id;
+        for (var i = 0; i < books.length; i++) {
+          if (i == 1) {
+            savedBooksOptions.next = books[i].id;
+            savedBooksOptions.nextId = i;
+          }
+          if (i == books.length - 1) {
+            savedBooksOptions.prev = books[i].id;
+            savedBooksOptions.prevId = i;
+          }
         }
-        if (i == books.length - 1) {
-          savedBooksOptions.prev = books[i].id;
-          savedBooksOptions.prevId = i;
-        }
+        displayBook(id, function (text) {
+          var getData = {
+            text: text,
+            buttons: options
+          }
+          callback(null, getData);
+        });
       }
-      displayBook(id, function (text) {
-        var getData = {
-          text: text,
-          buttons: options
-        }
-        callback(getData);
-      });
     }
   });
   if (howSave == "liked") {
@@ -157,34 +161,38 @@ BotFunctions.prototype.showNextSavedBooks = function(params, callback) {
       }
     }
   }
-  object.getListUserBooks(chatId, function (books) {
-    console.log(books);
-    var id = options.next;
-    for (var i = 0; i < books.length; i++) {
-      if (i === options.nextId && options.nextId === books.length - 1) {
-        options.nextId = 0;
-        var j = Math.abs(i - 2);
-        options.prevId = j;
-        options.next = books[0].id;
-        options.prev = books[j].id;
-        break;
-      } if (i === options.nextId && options.nextId === 0) {
-        options.nextId = i + 1;
-        options.prevId = books.length - 1;
-        options.next = books[i + 1].id;
-        options.prev = books[books.length - 1].id;
-        break;
-      } else if (i === options.nextId) {
-        options.nextId = i + 1;
-        options.prevId = i - 1;
-        options.next = books[i + 1].id;
-        options.prev = books[i - 1].id;
-        break;
+  object.getListUserBooks(chatId, function (err, books) {
+    if (err) {
+      callback(new Error("500 Server Error"));
+    } else {
+      console.log(books);
+      var id = options.next;
+      for (var i = 0; i < books.length; i++) {
+        if (i === options.nextId && options.nextId === books.length - 1) {
+          options.nextId = 0;
+          var j = Math.abs(i - 2);
+          options.prevId = j;
+          options.next = books[0].id;
+          options.prev = books[j].id;
+          break;
+        } if (i === options.nextId && options.nextId === 0) {
+          options.nextId = i + 1;
+          options.prevId = books.length - 1;
+          options.next = books[i + 1].id;
+          options.prev = books[books.length - 1].id;
+          break;
+        } else if (i === options.nextId) {
+          options.nextId = i + 1;
+          options.prevId = i - 1;
+          options.next = books[i + 1].id;
+          options.prev = books[i - 1].id;
+          break;
+        }
       }
+      displayBook(id, function (text) {
+        callback(null, text);
+      });
     }
-    displayBook(id, function (text) {
-      callback(text);
-    });
   });
   if (howSaved == 'read') this._readBooksOptions = options;
   if (howSaved == 'liked') this._likedBooksOptions = options;
@@ -209,32 +217,36 @@ BotFunctions.prototype.showPrevSavedBooks = function(params, callback) {
       }
     }
   }
-  object.getListUserBooks(chatId, function (books) {
-    var id = options.prev;
-    for (var i = 0; i < books.length; i++) {
-      if (i === options.prevId && options.prevId === 0) {
-        options.nextId = i + 1;
-        options.prevId = books.length - 1;
-        options.next = books[i + 1].id;
-        options.prev = books[books.length - 1].id;
-        break;
-      } if (i === options.prevId && options.prevId === books.length - 1) {
-        options.nextId = 0;
-        options.prevId = i - 1;
-        options.next = books[0].id;
-        options.prev = books[i - 1].id;
-        break;
-      } else if (i === options.prevId) {
-        options.nextId = i + 1;
-        options.prevId = i - 1;
-        options.next = books[i + 1].id;
-        options.prev = books[i - 1].id;
-        break;
+  object.getListUserBooks(chatId, function (err, books) {
+    if (err) {
+      callback(new Error("500 Server Error"));
+    } else {
+      var id = options.prev;
+      for (var i = 0; i < books.length; i++) {
+        if (i === options.prevId && options.prevId === 0) {
+          options.nextId = i + 1;
+          options.prevId = books.length - 1;
+          options.next = books[i + 1].id;
+          options.prev = books[books.length - 1].id;
+          break;
+        } if (i === options.prevId && options.prevId === books.length - 1) {
+          options.nextId = 0;
+          options.prevId = i - 1;
+          options.next = books[0].id;
+          options.prev = books[i - 1].id;
+          break;
+        } else if (i === options.prevId) {
+          options.nextId = i + 1;
+          options.prevId = i - 1;
+          options.next = books[i + 1].id;
+          options.prev = books[i - 1].id;
+          break;
+        }
       }
+      displayBook(id, function (text) {
+        callback(null, text);
+      });
     }
-    displayBook(id, function (text) {
-      callback(text);
-    });
   });
   if (howSaved == 'read') this._readBooksOptions = options;
   if (howSaved == 'liked') this._likedBooksOptions = options;

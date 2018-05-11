@@ -12,15 +12,18 @@ function LikedBooks() {
 LikedBooks.prototype.setBook = function (userId, bookId) {
   likedBook.findOrCreate({ where: { user_id: userId, book_id: bookId, status: 'added'}})
   .spread((book, created) => {
-    console.log(book.get());
     console.log(created);
+  }).catch( function (err) {
+    console.log(new Error("Server problem"));
   });
 };
 
 LikedBooks.prototype.getLikedBookId = function (id, callback) {
   likedBook.findOne({where: {book_id: id}, attributes: ['id']}).then(book => {
     var id = JSON.parse(JSON.stringify(book));
-    callback(id);
+    callback(null, id);
+  }).catch( function (err) {
+    callback(new Error("Server problem"));
   });
 };
 
@@ -32,7 +35,6 @@ LikedBooks.prototype.getLikedBook = function (id, callback) {
     }]
   }).then(book => {
     var data = JSON.parse(JSON.stringify(book));
-    console.log(data);
     var bookData = {
       id: data.book.id,
       name: data.book.name,
@@ -40,7 +42,9 @@ LikedBooks.prototype.getLikedBook = function (id, callback) {
       genres: data.book.genres,
       description: data.book.description,
     }
-    callback(bookData);
+    callback(null, bookData);
+  }).catch( function (err) {
+    callback(new Error("Server problem"));
   });
 };
 
@@ -62,11 +66,13 @@ LikedBooks.prototype.getListUserBooks = function (userId, callback) {
       for (var i = 0; i < data.length; i++) {
         booksList[i] = data[i].book;
       }
-      callback(booksList);
+      callback(null, booksList);
     } else {
-      callback('empty');
+      callback(null, 'empty');
     }
-  });
+  }).catch( function (err) {
+    callback(new Error("Server problem"));
+  });;
 }
 
 module.exports = LikedBooks;
