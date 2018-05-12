@@ -8,7 +8,7 @@ function Books() {
 }
 
 Books.prototype.getBook = function (id, callback) {
-  book.findOne({where: {id: id}}).then(book => {
+  book.findOne({where: {id: id}}).then(function (book) {
     var bookData = {
       id: book.id,
       name: book.name,
@@ -20,13 +20,9 @@ Books.prototype.getBook = function (id, callback) {
       link: book.link,
       cover: book.cover
     }
-    callback(bookData);
-  });
-};
-
-Books.prototype.getCountOfBooks = function (callback) {
-  book.count().then(count => {
-    callback(count);
+    callback(null, bookData);
+  }).catch( function (err) {
+    callback(new Error("Server problem"));
   });
 };
 

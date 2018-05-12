@@ -21,6 +21,7 @@ var recommendation = new Recommendation();
 
 function BotFunctions() {
   this._randBook = 0;
+  this._addedToRead = 0;
   this._recommendBookId = 0;
   this._likedBooksOptions = {};
   this._readBooksOptions = {};
@@ -29,17 +30,23 @@ function BotFunctions() {
 
 function randomInt(min, max) {
   var num = min - 0.5 + Math.random() * (max - min + 1);
-  num = Math.round(rand);
+  num = Math.round(num);
   return num;
 }
 
 function displayBook(id, callback) {
-  books.getBook(id, (bookArray) => {
-    var text = "<b>Название книги:</b> " + bookArray.name +
-        "\n<b>Автор:</b> " + bookArray.authors + "\n<b>Жанры:</b> " + bookArray.genres +
-        "\n<b>Описание книги:</b>\n" + bookArray.description +
-        "\n<a href='" + bookArray.link + "'>Читать рецензии на сайте LiveLib</a>";
-    callback(text);
+  books.getBook(id, function (err, bookArray) {
+    if (err) {
+      console.log(err);
+      callback(new Error("Книга не найдена"));
+    } else {
+      console.log(bookArray);
+      var text = "<b>Название книги:</b> " + bookArray.name +
+          "\n<b>Автор:</b> " + bookArray.authors + "\n<b>Жанры:</b> " + bookArray.genres +
+          "\n<b>Описание книги:</b>\n" + bookArray.description +
+          "\n<a href='" + bookArray.link + "'>Читать рецензии на сайте LiveLib</a>";
+      callback(null, text);
+    }
   });
 }
 
@@ -72,12 +79,16 @@ BotFunctions.prototype.getRecommendationBook = function(userId, messageId, callb
   var options = buildInlineKeyboards(buttons);
   recommendation.getRecommendBook(userId, messageId, function (book) {
     var id = book.id;
-    displayBook(id, function (text) {
-      var getData = {
-        text: text,
-        buttons: options
+    displayBook(id, function (err, text) {
+      if (err) {
+        callback(new Error("Server error"));
+      } else {
+        var getData = {
+          text: text,
+          buttons: options
+        }
+        callback(null, getData);
       }
-      callback(getData);
     });
   });
 }
@@ -123,12 +134,16 @@ BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, call
             savedBooksOptions.prevId = i;
           }
         }
-        displayBook(id, function (text) {
-          var getData = {
-            text: text,
-            buttons: options
+        displayBook(id, function (err, text) {
+          if (err) {
+            callback(new Error("Derver problem"));
+          } else {
+            var getData = {
+              text: text,
+              buttons: options
+            }
+            callback(null, getData);
           }
-          callback(null, getData);
         });
       }
     }
@@ -189,8 +204,12 @@ BotFunctions.prototype.showNextSavedBooks = function(params, callback) {
           break;
         }
       }
-      displayBook(id, function (text) {
-        callback(null, text);
+      displayBook(id, function (err, text) {
+        if (err) {
+          callback(new Error("Server problem"));
+        } else {
+          callback(null, text);
+        }
       });
     }
   });
@@ -243,8 +262,12 @@ BotFunctions.prototype.showPrevSavedBooks = function(params, callback) {
           break;
         }
       }
-      displayBook(id, function (text) {
-        callback(null, text);
+      displayBook(id, function (err, text) {
+        if (err) {
+          callback(new Error("Server problem"));
+        } else {
+          callback(null, text);
+        }
       });
     }
   });
@@ -252,28 +275,30 @@ BotFunctions.prototype.showPrevSavedBooks = function(params, callback) {
   if (howSaved == 'liked') this._likedBooksOptions = options;
 }
 
-BotFunctions.prototype.getRandomBook = function(chatId, callback) {
-  var readBooks = new ReadBooks();
+BotFunctions.prototype.getRandomBook = function(callback) {
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
     [{ text: "сохранить", callback_data: "save"},
      { text: "читал(а)", callback_data: "imread"}]
   ];
   var options = buildInlineKeyboards(buttons);
-  var addedToRead = 0;
-  var addedToSave = 0;
   var rand = randomInt(1, 422);
   this._randBook = rand;
-  var send = displayBook(rand, function (text) {
-    var getData = {
-      text: text,
-      buttons: options
+  displayBook(rand, function (err, text) {
+    if (err) {
+      callback(new Error("Server problem"));
+    } else {
+      var getData = {
+        text: text,
+        buttons: options
+      }
+      console.log(getData);
+      callback(null, getData);
     }
-    callback(getData);
   });
 }
 
-BotFunctions.prototype.editRandomBook = function(params, callback) {
+BotFunctions.prototype.editRandomBook = function(callback) {
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
     [{ text: "сохранить", callback_data: "save"},
@@ -282,16 +307,20 @@ BotFunctions.prototype.editRandomBook = function(params, callback) {
   var options = buildInlineKeyboards(buttons);
   var rand = randomInt(1, 422);
   this._randBook = rand;
-  var addedToRead = this.addedToRead;
-  displayBook(rand, function (text) {
-    var data = {
-      text: text,
-      buttons: options,
-      read: (addedToRead === 1 ? true : false)
+  var addedToRead = this._addedToRead;
+  displayBook(rand, function (err, text) {
+    if (err) {
+      callback(new Error('Книга не найдена'));
+    } else {
+      var getData = {
+        text: text,
+        buttons: options,
+        read: (addedToRead === 1 ? true : false)
+      }
+      callback(null, getData);
     }
-    callback(data);
   });
-  this.addedToRead = 0;
+  this._addedToRead = 0;
 }
 
 BotFunctions.prototype.setToReadRandomBook = function(params, callback) {
@@ -301,11 +330,12 @@ BotFunctions.prototype.setToReadRandomBook = function(params, callback) {
     [{ text: "добавлено в прочитанные", callback_data: "..."}]
   ];
   var options = buildInlineKeyboards(buttons);
-  this.addedToRead = 1;
+  this._addedToRead = 1;
   var bookId = this._randBook;
-  readBooks.setBook(params.chat_id, bookId);
+  var userId = params.chat_id;
+  readBooks.setBook(userId, bookId);
   var options = buildInlineKeyboards(buttons);
-  callback(options);
+  callback(null, options);
 }
 
 module.exports = BotFunctions;

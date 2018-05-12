@@ -71,19 +71,30 @@ module.exports = function(token, options) {
           break;
         case '/recommendation':
           var messageId = msg.message_id + 1;
-          func.getRecommendationBook(chatId, messageId, function (res) {
-            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-            setTimeout( function () {
-              bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", res.buttons);
-            }, 1000);
+          func.getRecommendationBook(chatId, messageId, function (req, res) {
+            if (req) {
+              console.log(req);
+              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+            } else {
+              bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+              setTimeout( function () {
+                bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", res.buttons);
+              }, 1000);
+            }
           });
           break;
         case '/random':
-          func.getRandomBook(chatId, function (res) {
-            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-            setTimeout( function() {
-              bot.sendMessage(chatId, "Выберите один из вариантов", res.buttons);
-            }, 1000);
+          func.getRandomBook(function (req, res) {
+            if (req) {
+              console.log(req);
+              bot.sendMessage(chatId, "404 Книга не найдена", { parse_mode: "HTML" });
+            } else {
+              console.log(res);
+              bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+              setTimeout( function() {
+                bot.sendMessage(chatId, "Выберите один из вариантов", res.buttons);
+              }, 1000);
+            }
           });
           break;
         case '/read':
@@ -95,7 +106,7 @@ module.exports = function(token, options) {
             } else {
               bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
               setTimeout( function() {
-                bot.sendMessage(chatId, "Выберите прочитанные книги", res.buttons);
+                bot.sendMessage(chatId, "Ваши прочитанные книги", res.buttons);
               }, 1000);
             }
           });
@@ -109,7 +120,7 @@ module.exports = function(token, options) {
             } else {
               bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
               setTimeout( function() {
-                bot.sendMessage(chatId, "Ваши понравившиеся книг", res.buttons);
+                bot.sendMessage(chatId, "Ваши понравившиеся книги", res.buttons);
               }, 1000);
             }
           });
@@ -131,16 +142,26 @@ module.exports = function(token, options) {
         bot.editMessageText(text, telegramOptions);
       }
       if (action === 'other') {
-        func.editRandomBook(telegramOptions, function (res) {
-          bot.editMessageText(res.text, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
-          if (res.read) {
-            bot.editMessageReplyMarkup( res.buttons.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
+        func.editRandomBook(function (req, res) {
+          if (req) {
+            console.log(req);
+            bot.editMessageText("Ошибка сервера! Попробуйте позже", { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
+          } else {
+            bot.editMessageText(res.text, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
+            if (res.read) {
+              bot.editMessageReplyMarkup( res.buttons.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
+            }
           }
         });
       }
       if (action === 'imread') {
-        func.setToReadRandomBook(telegramOptions, function (res) {
-          bot.editMessageReplyMarkup( res.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
+        func.setToReadRandomBook(telegramOptions, function (req, res) {
+          if (req) {
+            console.log(req);
+            bot.editMessageText("Ошибка сервера! Попробуйте позже", { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
+          } else {
+            bot.editMessageReplyMarkup( res.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
+          }
         });
       }
       if (action === 'next') {
@@ -172,7 +193,10 @@ module.exports = function(token, options) {
       if (action === 'dislike') {
         func.editRecommendBook(telegramOptions, 'dislike');
       }
+    });
 
+    bot.on('polling_error', (error) => {
+      console.log(error.code);
     });
 
   }).catch(function () {
