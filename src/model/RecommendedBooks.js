@@ -42,6 +42,20 @@ RecommendedBooks.prototype.getRecommendedBook = function(id, callback) {
   });
 }
 
+RecommendedBooks.prototype.getRecommendBookByUserAndMessage = function (userId, messageId, callback) {
+  recommendedBook.findOne({
+    where: { user_id: userId, message_id: messageId },
+  }).then(book => {
+    var bookArray = JSON.parse(JSON.stringify(book));
+    var bookData = {
+      book_id: bookArray.book_id,
+    }
+    callback(null, bookData);
+  }).catch(err => {
+    callback(new Error("Server problem"));
+  });
+}
+
 RecommendedBooks.prototype.checkExistRecommendedBookByReview = function (reviewId, userId, callback) {
   recommendedBook.findOne({
     where: { review_id: reviewId, user_id: userId }
@@ -89,8 +103,18 @@ RecommendedBooks.prototype.getAllLikedBooksOfUser = function (userId, callback) 
   });
 }
 
-RecommendedBooks.prototype.updateRecommendedBookStatus = function (userId, messageId, status) {
-  recommendedBook.update({ user_choose: status}, { where: { user_id: userId, message_id: messageId }});
+RecommendedBooks.prototype.updateRecommendedBookStatus = function (userId, messageId, status, callback) {
+  recommendedBook.update({ user_choose: status}, {
+    where: { user_id: userId, message_id: messageId },
+    returning: true,
+    plain: true
+  }).then(result => {
+    console.log(result);
+    callback(null, result);
+  }).catch(err => {
+    console.log(new Error("Server problem"));
+    callback(new Error("Server problem"));
+  });
 }
 
 module.exports = RecommendedBooks;

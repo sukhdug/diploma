@@ -387,6 +387,30 @@ BotFunctions.prototype.getFoundBooks = function(searchBook, callback) {
   })
 }
 
-//BotFunctions.prototype.
+BotFunctions.prototype.updateRecommendedBookStatus = function (userId, messageId, status) {
+  recommendedBooks.updateRecommendedBookStatus(userId, messageId, status, function (req, res) {
+    if (req) {
+      console.log(req);
+    } else {
+      recommendedBooks.getRecommendBookByUserAndMessage(userId, messageId, function (req, res) {
+        if (req) {
+            console.log(req);
+        } else {
+          var bookId = res.book_id;
+          if (status == 'read') {
+            readBooks.setBook(userId, bookId);
+          }
+          if (status == 'like') {
+            likedBooks.setBook(userId, bookId);
+          }
+        }
+      });
+    }
+  });
+};
+
+BotFunctions.prototype.getRecommendBookForUser = function () {
+
+}
 
 module.exports = BotFunctions;

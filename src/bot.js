@@ -217,13 +217,19 @@ module.exports = function(token, options) {
         bot.sendMessage(telegramOptions.chat_id, "Symbol");
       }
       if (action === 'like') {
-
+        var userId = telegramOptions.chat_id;
+        var messageId = telegramOptions.message_id - 1;
+        func.updateRecommendedBookStatus(userId, messageId, 'like');
       }
       if (action === 'read') {
-
+        var userId = telegramOptions.chat_id;
+        var messageId = telegramOptions.message_id - 1;
+        func.updateRecommendedBookStatus(userId, messageId, 'read');
       }
       if (action === 'dislike') {
-        func.editRecommendBook(telegramOptions, 'dislike');
+        var userId = telegramOptions.chat_id;
+        var messageId = telegramOptions.message_id - 1;
+        func.updateRecommendedBookStatus(userId, messageId, 'dislike');
       }
     });
 

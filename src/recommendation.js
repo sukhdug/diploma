@@ -21,7 +21,12 @@ function Recommendation() {
 
 function callHimself(userId, messageId) {
   var rec = new Recommendation();
-  rec.getRecommendBook(userId, messageId);
+  return rec.getRecommendBook(userId, messageId);
+}
+
+function callHimselfForm(userId, messageId) {
+  var rec = new Recommendation();
+  return rec.formRecommendBookForUser(userId);
 }
 
 Recommendation.prototype.getRecommendBook = function (userId, messageId, callback) {
@@ -45,14 +50,12 @@ Recommendation.prototype.getRecommendBook = function (userId, messageId, callbac
           } else if (result === 'exist') {
             console.log('exist');
             callHimself(userId, messageId);
-            //Recommendation.formRecommendBook();
           }
         });
       });
     } else if (result === 'exist') {
       console.log('exist');
       callHimself(userId, messageId);
-      //Recommendation.formRecommendBook();
     }
   });
 }
@@ -82,6 +85,8 @@ Recommendation.prototype.formRecommendBookForUser = function(userId, callback) {
                         callback(book);
                       });
                     });
+                  } else {
+
                   }
                 });
               }
