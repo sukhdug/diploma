@@ -19,6 +19,11 @@ function randomInt(min, max) {
 function Recommendation() {
 }
 
+function callHimself(userId, messageId) {
+  var rec = new Recommendation();
+  rec.getRecommendBook(userId, messageId);
+}
+
 Recommendation.prototype.getRecommendBook = function (userId, messageId, callback) {
   var rand = randomInt(1, 931);
   var reviewId = rand;
@@ -39,12 +44,14 @@ Recommendation.prototype.getRecommendBook = function (userId, messageId, callbac
             });
           } else if (result === 'exist') {
             console.log('exist');
+            callHimself(userId, messageId);
             //Recommendation.formRecommendBook();
           }
         });
       });
     } else if (result === 'exist') {
       console.log('exist');
+      callHimself(userId, messageId);
       //Recommendation.formRecommendBook();
     }
   });

@@ -47,13 +47,18 @@ module.exports = function(token, options) {
 
     bot.onText(/\/search ([а-яА-Я]+)/, function (msg, match) {
       var chatId = msg.chat.id;
-      var searchBook = match[1];
+      var searchBook = msg.text.replace('/search ', '');
       func.getFoundBooks(searchBook, function (req, res) {
         if (req) {
           console.log(req);
           bot.sendMessage(chatId, "500 Server Error! Sorry :-(");
         } else {
-          bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+          if (res.pages > 1) {
+            var options = res.options;
+            bot.sendMessage(chatId, res.text, options);
+          } else {
+            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+          }
         }
       });
     });
@@ -121,7 +126,7 @@ module.exports = function(token, options) {
               bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
               if (res.length > 1) {
                 setTimeout( function() {
-                  bot.sendMessage(chatId, "Ваши прочитанные книги", res.buttons);
+                  bot.sendMessage(chatId, "Ваши прочитанные книги", res.options);
                 }, 1000);
               }
             }
@@ -191,7 +196,7 @@ module.exports = function(token, options) {
         func.showNextSavedBooks(telegramOptions, function (req, res) {
           if (req) {
             console.log(req);
-            bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+            bot.sendMessage(telegramOptions.chat_id, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
           } else {
             bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
           }
@@ -201,11 +206,15 @@ module.exports = function(token, options) {
         func.showPrevSavedBooks(telegramOptions, function (req, res) {
           if (req) {
             console.log(req);
-            bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+            bot.sendMessage(telegramOptions.chat_id, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
           } else {
             bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
           }
         });
+      }
+      if (action === /\search([0-9]+)/) {
+        console.log(action);
+        bot.sendMessage(telegramOptions.chat_id, "Symbol");
       }
       if (action === 'like') {
 

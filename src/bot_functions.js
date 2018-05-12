@@ -55,7 +55,8 @@ function buildInlineKeyboards(buttons) {
     reply_markup: JSON.stringify({
       inline_keyboard: buttons,
       parse_mode: "HTML"
-    })
+    }),
+    parse_mode: "HTML"
   }
   return options;
 }
@@ -136,7 +137,7 @@ BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, call
           var getData = {
             text: text,
             length: books.length,
-            buttons: options
+            options: options
           }
           callback(null, getData);
         }
@@ -346,19 +347,46 @@ BotFunctions.prototype.getFoundBooks = function(searchBook, callback) {
               "<i>" + books[i].genres + "</i>\n" +
               "<a href='" + books[i].link + "'>Рецензии на LiveLib</a>\n\n";
         }
-        callback(null, text);
+        var totalPages = Math.ceil(books.length / 5);
+        var paginationButtons = [];
+        if (totalPages <= 5) {
+          for (var i = 0; i < totalPages; i++) {
+               paginationButtons.push({ text: i + 1, callback_data: 'search' + i});
+          }
+        } else {
+          for (var i = 0; i < 4; i++) {
+               paginationButtons.push({ text: i + 1, callback_data: 'search' + i});
+          }
+          paginationButtons.push({ text: totalPages + ' »', callback_data: 'search' + totalPages});
+        }
+        var buttons = [paginationButtons];
+        console.log(buttons);
+        var options = buildInlineKeyboards(buttons);
+        var getData = {
+          pages: totalPages,
+          text: text,
+          options: options
+        }
+        callback(null, getData);
       } else if (books.length != 0 && books.length <= 5) {
         for (var i = 0; i < books.length; i++) {
           text += "<b>" + books[i].name + "</b>\n" + books[i].authors + '\n' +
               "<i>" + books[i].genres + "</i>\n" +
               "<a href='" + books[i].link + "'>Рецензии на LiveLib</a>\n\n";
         }
-        callback(null, text);
+        var getData = {
+          pages: 1,
+          text: text
+        }
+        callback(null, getData);
       } else {
-        callback(null, "К сожалению, сервер не нашел книг!");
+        var getData = {text: "К сожалению, сервер не нашел книг!", pages: 0}
+        callback(null, getData);
       }
     }
   })
 }
+
+//BotFunctions.prototype.
 
 module.exports = BotFunctions;
