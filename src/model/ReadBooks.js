@@ -60,16 +60,12 @@ ReadBooks.prototype.getListUserBooks = function (userId, callback) {
     }],
     attributes: ['book_id']
   }).then(books => {
-    if (typeof books !== 'undefined' && books.length > 0) {
-      var data = JSON.parse(JSON.stringify(books));
-      var booksList = [];
-      for (var i = 0; i < data.length; i++) {
-        booksList[i] = data[i].book;
-      }
-      callback(null, booksList);
-    } else {
-      callback(null, 'empty');
+    var data = JSON.parse(JSON.stringify(books));
+    var booksList = [];
+    for (var i = 0; i < data.length; i++) {
+      booksList[i] = data[i].book;
     }
+    callback(null, booksList);
   }).catch( function (err) {
     callback(new Error("Server problem"));
   });

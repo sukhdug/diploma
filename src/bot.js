@@ -48,6 +48,10 @@ module.exports = function(token, options) {
       var command = msg.text.replace(botName, '');
       var chatId = msg.chat.id;
       var user = msg.chat.username;
+
+      var search = '/search';
+      var regexp = '/el.t/g';
+      var searchText = search + ' ' + regexp;
       switch (command) {
         case '/start':
           func.getCommandResult('start', function (req, res) {
@@ -102,12 +106,14 @@ module.exports = function(token, options) {
           func.getSavedBooks(chatId, messageId, 'read', function (req, res) {
             if (req) {
               console.log(req);
-              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+              bot.sendMessage(chatId, "К сожалению, сервер не нашел книг. Попробуйте сохранить книги в этот раздел.");
             } else {
               bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-              setTimeout( function() {
-                bot.sendMessage(chatId, "Ваши прочитанные книги", res.buttons);
-              }, 1000);
+              if (res.length > 1) {
+                setTimeout( function() {
+                  bot.sendMessage(chatId, "Ваши прочитанные книги", res.buttons);
+                }, 1000);
+              }
             }
           });
           break;
@@ -116,14 +122,19 @@ module.exports = function(token, options) {
           func.getSavedBooks(chatId, messageId, 'liked', function (req, res) {
             if (req) {
               console.log(req);
-              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+              bot.sendMessage(chatId, "К сожалению, сервер не нашел книг. Попробуйте сохранить книги в этот раздел");
             } else {
-              bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-              setTimeout( function() {
-                bot.sendMessage(chatId, "Ваши понравившиеся книги", res.buttons);
-              }, 1000);
+              if (res.length > 1) {
+                bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+                setTimeout( function() {
+                  bot.sendMessage(chatId, "Ваши понравившиеся книги", res.buttons);
+                }, 1000);
+              }
             }
           });
+          break;
+        case searchText:
+          bot.sendMessage(chatId, "Symbol");
           break;
         default:
           bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");

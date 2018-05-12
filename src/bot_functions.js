@@ -110,42 +110,37 @@ BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, call
     if (err) {
       callback(new Error("500 Server Error"));
     } else {
-      if (books == 'empty') {
-        console.log(books);
-        var empty = "У Вас пока нет сохраненных книг в ";
-        callback(empty);
-      } else {
-        var buttons = [
-          [
-            { text: "<<", callback_data: "prev"},
-            { text: "список", callback_data: "list" },
-            { text: ">>", callback_data: "next"}
-          ]
-        ];
-        var options = buildInlineKeyboards(buttons);
-        var id = books[0].id;
-        for (var i = 0; i < books.length; i++) {
-          if (i == 1) {
-            savedBooksOptions.next = books[i].id;
-            savedBooksOptions.nextId = i;
-          }
-          if (i == books.length - 1) {
-            savedBooksOptions.prev = books[i].id;
-            savedBooksOptions.prevId = i;
-          }
+      var buttons = [
+        [
+          { text: "<<", callback_data: "prev"},
+          { text: "список", callback_data: "list" },
+          { text: ">>", callback_data: "next"}
+        ]
+      ];
+      var options = buildInlineKeyboards(buttons);
+      var id = books[0].id;
+      for (var i = 0; i < books.length; i++) {
+        if (i == 1) {
+          savedBooksOptions.next = books[i].id;
+          savedBooksOptions.nextId = i;
         }
-        displayBook(id, function (err, text) {
-          if (err) {
-            callback(new Error("Derver problem"));
-          } else {
-            var getData = {
-              text: text,
-              buttons: options
-            }
-            callback(null, getData);
-          }
-        });
+        if (i == books.length - 1) {
+          savedBooksOptions.prev = books[i].id;
+          savedBooksOptions.prevId = i;
+        }
       }
+      displayBook(id, function (err, text) {
+        if (err) {
+          callback(new Error("Server problem"));
+        } else {
+          var getData = {
+            text: text,
+            length: books.length,
+            buttons: options
+          }
+          callback(null, getData);
+        }
+      });
     }
   });
   if (howSave == "liked") {
