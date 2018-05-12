@@ -44,14 +44,24 @@ module.exports = function(token, options) {
 
   bot.getMe().then( function (me) {
     var botName =  '@' + me.username;
+
+    bot.onText(/\/search ([а-яА-Я]+)/, function (msg, match) {
+      var chatId = msg.chat.id;
+      var searchBook = match[1];
+      func.getFoundBooks(searchBook, function (req, res) {
+        if (req) {
+          console.log(req);
+          bot.sendMessage(chatId, "500 Server Error! Sorry :-(");
+        } else {
+          bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+        }
+      });
+    });
+
     bot.on('text', function (msg) {
       var command = msg.text.replace(botName, '');
       var chatId = msg.chat.id;
       var user = msg.chat.username;
-
-      var search = '/search';
-      var regexp = '/el.t/g';
-      var searchText = search + ' ' + regexp;
       switch (command) {
         case '/start':
           func.getCommandResult('start', function (req, res) {
@@ -133,13 +143,15 @@ module.exports = function(token, options) {
             }
           });
           break;
-        case searchText:
-          bot.sendMessage(chatId, "Symbol");
+        case '/search':
+          bot.sendMessage(chatId, "Чтобы найти книги по названию, отправьте сообщение /search [название книги]\n" +
+          "например, /search Жизнь Галилея");
           break;
-        default:
-          bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
+        //default:
+        //  bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
       }
     });
+
     bot.on('callback_query', function (callbackQuery) {
       const action = callbackQuery.data;
       const msg = callbackQuery.message;

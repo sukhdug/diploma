@@ -333,4 +333,32 @@ BotFunctions.prototype.setToReadRandomBook = function(params, callback) {
   callback(null, options);
 }
 
+BotFunctions.prototype.getFoundBooks = function(searchBook, callback) {
+  books.getListFoundBooks(searchBook, function (err, books) {
+    if (err) {
+      callback(new Error("500 Server Error"));
+    } else {
+      var text = "";
+      console.log(books.length);
+      if (books.length > 5) {
+        for (var i = 0; i < 5; i++) {
+          text += "<b>" + books[i].name + "</b>\n" + books[i].authors + '\n' +
+              "<i>" + books[i].genres + "</i>\n" +
+              "<a href='" + books[i].link + "'>Рецензии на LiveLib</a>\n\n";
+        }
+        callback(null, text);
+      } else if (books.length != 0 && books.length <= 5) {
+        for (var i = 0; i < books.length; i++) {
+          text += "<b>" + books[i].name + "</b>\n" + books[i].authors + '\n' +
+              "<i>" + books[i].genres + "</i>\n" +
+              "<a href='" + books[i].link + "'>Рецензии на LiveLib</a>\n\n";
+        }
+        callback(null, text);
+      } else {
+        callback(null, "К сожалению, сервер не нашел книг!");
+      }
+    }
+  })
+}
+
 module.exports = BotFunctions;
