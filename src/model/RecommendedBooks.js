@@ -18,6 +18,15 @@ RecommendedBooks.prototype.setRecommendBook = function (bookId, readerId, review
   });
 }
 
+RecommendedBooks.prototype.setNotRecommendBook = function (bookId, readerId, reviewId, userId, callback) {
+  var userChoose = 'recommend';
+  recommendedBook.create({ book_id: bookId, reader_id: readerId, review_id: reviewId, user_id: userId, user_choose: userChoose })
+  .then( result => {
+    console.log(result.id);
+    callback(result.id);
+  });
+}
+
 RecommendedBooks.prototype.getRecommendedBook = function(id, callback) {
   recommendedBook.findOne({
     where: { id: id },
@@ -96,16 +105,18 @@ RecommendedBooks.prototype.getAllLikedBooksOfUser = function (userId, callback) 
           reader_id: bookArray[i].reader_id
         }
       }
-      callback(bookData);
+      callback(null, bookData);
     } else {
-      callback('empty');
+      callback(null, 'empty');
     }
+  }).catch(err => {
+    callback(new Error("Server problem"));
   });
 }
 
 RecommendedBooks.prototype.updateRecommendedBookStatus = function (userId, messageId, status, callback) {
   recommendedBook.update({ user_choose: status}, {
-    where: { user_id: userId, message_id: messageId },
+    where: { user_id: userId, message_id: messageId, user_choose: 'recommend' },
     returning: true,
     plain: true
   }).then(result => {

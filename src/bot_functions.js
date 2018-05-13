@@ -40,7 +40,6 @@ function displayBook(id, callback) {
       console.log(err);
       callback(new Error("Книга не найдена"));
     } else {
-      console.log(bookArray);
       var text = "<b>Название книги:</b> " + bookArray.name +
           "\n<b>Автор:</b> " + bookArray.authors + "\n<b>Жанры:</b> " + bookArray.genres +
           "\n<b>Описание книги:</b>\n" + bookArray.description +
@@ -409,8 +408,40 @@ BotFunctions.prototype.updateRecommendedBookStatus = function (userId, messageId
   });
 };
 
-BotFunctions.prototype.getRecommendBookForUser = function () {
-
+BotFunctions.prototype.getRecommendBookForUser = function (userId, messageId, callback) {
+  recommendation.formRecommendBookForUser(userId, messageId, function (req, book) {
+    if (req) {
+      callback(new Error("Server error"));
+    } else {
+      if (book === 'empty') {
+        recommendation.getRecommendBook(userId, messageId, function (book) {
+          var id = book.id;
+          displayBook(id, function (err, text) {
+            if (err) {
+              callback(new Error("Server error"));
+            } else {
+              var getData = {
+                text: text
+              }
+              callback(null, getData);
+            }
+          });
+        });
+      } else {
+        var id = book.id;
+        displayBook(id, function (err, text) {
+          if (err) {
+            callback(new Error("Server error"));
+          } else {
+            var getData = {
+              text: text
+            }
+            callback(null, getData);
+          }
+        });
+      }
+    }
+  });
 }
 
 module.exports = BotFunctions;

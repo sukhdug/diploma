@@ -142,7 +142,7 @@ module.exports = function(token, options) {
               if (res.length > 1) {
                 bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
                 setTimeout( function() {
-                  bot.sendMessage(chatId, "Ваши понравившиеся книги", res.buttons);
+                  bot.sendMessage(chatId, "Ваши понравившиеся книги", res.options);
                 }, 1000);
               }
             }
@@ -220,6 +220,14 @@ module.exports = function(token, options) {
         var userId = telegramOptions.chat_id;
         var messageId = telegramOptions.message_id - 1;
         func.updateRecommendedBookStatus(userId, messageId, 'like');
+        func.getRecommendBookForUser(userId, messageId, function (req, res) {
+          if (req) {
+            console.log(req);
+            bot.editMessageText("Серверная ошибка! Попробуйте позже!", { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
+          } else {
+            bot.editMessageText(res.text, { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
+          }
+        });
       }
       if (action === 'read') {
         var userId = telegramOptions.chat_id;

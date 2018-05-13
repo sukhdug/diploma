@@ -2,6 +2,7 @@
 
 var Reader = require('./../entity/Reader');
 var Review = require('./../entity/Review');
+var Op = require('./../../config/op');
 
 var reader = Reader;
 var review = Review;
@@ -9,9 +10,9 @@ var review = Review;
 function Readers(){
 }
 
-Readers.prototype.getAllReviewsOfReader = function(readerId, callback) {
+Readers.prototype.getAllReviewsOfReaderExceptBook = function(readerId, bookId, callback) {
   review.findAll({
-    where: { reader_id: readerId }
+    where: { reader_id: readerId, book_id: { [Op.ne]: bookId }}
   }).then(books => {
     var bookArray = JSON.parse(JSON.stringify(books));
     var bookData = [];
@@ -23,7 +24,9 @@ Readers.prototype.getAllReviewsOfReader = function(readerId, callback) {
         rate: bookArray[i].rate
       }
     }
-    callback(bookData);
+    callback(null, bookData);
+  }).catch(err => {
+    callback(new Error("Server problem"));
   });
 }
 

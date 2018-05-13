@@ -21,12 +21,12 @@ function Recommendation() {
 
 function callHimself(userId, messageId) {
   var rec = new Recommendation();
-  return rec.getRecommendBook(userId, messageId);
+  rec.getRecommendBook(userId, messageId);
 }
 
-function callHimselfForm(userId, messageId) {
+function callHimselfForm(userId) {
   var rec = new Recommendation();
-  return rec.formRecommendBookForUser(userId);
+  rec.formRecommendBookForUser(userId);
 }
 
 Recommendation.prototype.getRecommendBook = function (userId, messageId, callback) {
@@ -60,46 +60,59 @@ Recommendation.prototype.getRecommendBook = function (userId, messageId, callbac
   });
 }
 
-Recommendation.prototype.formRecommendBookForUser = function(userId, callback) {
-  var reviewFound = 0;
-  var i = 0;
-  recommendedBooks.getAllLikedBooksOfUser(userId, function (books) {
-    //for (var i = 0; i < books.length; i++) {
-    if (books !== 'empty') {
-      do {
-        var readerId = books[i].reader_id;
-        reader.getAllReviewsOfReader(readerId, function (reviews) {
-          //for(var j = 0; j < reviews.length; j++) {
-          var j = 0;
-          while(reviewFound === 0) {
-            console.log("# рецензии: " + reviews[j].review_id);
-            var reviewId = reviews[j].review_id;
-            var bookId = reviews[j].book_id;
-            recommendedBooks.checkExistRecommendedBookByReview(reviewId, userId, function (result) {
-              if (result === 'empty') {
-                recommendedBooks.checkExistRecommendedBookByBook(bookId, userId, function (result) {
+Recommendation.prototype.formRecommendBookForUser = function(userId, messageId, callback) {
+  recommendedBooks.getAllLikedBooksOfUser(userId, function (req, books) {
+    if (req) {
+      callback(new Error("Server problem"));
+    } else {
+      var reviewFound = 0;
+      var i = 0;
+      if (books !== 'empty') {
+        do {
+          var readerId = books[i].reader_id;
+          var bookId = books[i].book_id;
+          reader.getAllReviewsOfReaderExceptBook(readerId, bookId, function (req, reviews) {
+            if (req) {
+              callback(new Error("Not Found"));
+            } else {
+              for (var j = 0; j < reviews.length; j++) {
+                console.log("# рецензии: " + reviews[j].review_id);
+                var reviewId = reviews[j].review_id;
+                var bookId = reviews[j].book_id;
+                console.log(reviewId);
+                recommendedBooks.checkExistRecommendedBookByReview(reviewId, userId, function (result) {
                   if (result === 'empty') {
-                    reviewFound = 1;
-                    recommendedBooks.setRecommendBook(bookId, readerId, reviewId, userId, function (id) {
-                      recommendedBooks.getRecommendedBook(id, function (book) {
-                        callback(book);
-                      });
+                    recommendedBooks.checkExistRecommendedBookByBook(bookId, userId, function (result) {
+                      if (result === 'empty') {
+                        recommendedBooks.setRecommendBook(bookId, readerId, reviewId, userId, messageId, function (id) {
+                          recommendedBooks.getRecommendedBook(id, function (book) {
+                            reviewFound = 1;
+                            callback(null, book);
+                          });
+                        });
+                      } else {
+                        console.log(result);
+                        console.log(reviewFound);
+                        callback(null, 'empty');
+                      }
                     });
                   } else {
-
+                    console.log(result);
+                    console.log(reviewFound);
+                    callback(null, 'empty');
                   }
                 });
+                if (reviewFound == 1) break;
               }
-            });
-            j++;
-            if (j == reviews.length) break;
-          }
-        });
-        i++;
-        if (i == books.length) break;
-      } while (reviewFound == 0);
-    } else {
-      console.log('empty');
+            }
+          });
+          i++;
+          if (i == books.length) break;
+        } while (reviewFound == 0);
+      } else {
+        console.log('empty');
+        callback(null, 'empty');
+      }
     }
   });
 }
