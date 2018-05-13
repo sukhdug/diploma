@@ -233,11 +233,27 @@ module.exports = function(token, options) {
         var userId = telegramOptions.chat_id;
         var messageId = telegramOptions.message_id - 1;
         func.updateRecommendedBookStatus(userId, messageId, 'read');
+        func.getRecommendBookForUser(userId, messageId, function (req, res) {
+          if (req) {
+            console.log(req);
+            bot.editMessageText("Серверная ошибка! Попробуйте позже!", { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
+          } else {
+            bot.editMessageText(res.text, { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
+          }
+        });
       }
       if (action === 'dislike') {
         var userId = telegramOptions.chat_id;
         var messageId = telegramOptions.message_id - 1;
         func.updateRecommendedBookStatus(userId, messageId, 'dislike');
+        func.getRecommendBookForUser(userId, messageId, function (req, res) {
+          if (req) {
+            console.log(req);
+            bot.editMessageText("Серверная ошибка! Попробуйте позже!", { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
+          } else {
+            bot.editMessageText(res.text, { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
+          }
+        });
       }
     });
 

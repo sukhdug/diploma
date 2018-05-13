@@ -93,7 +93,8 @@ RecommendedBooks.prototype.checkExistRecommendedBookByBook = function (bookId, u
 
 RecommendedBooks.prototype.getAllLikedBooksOfUser = function (userId, callback) {
   recommendedBook.findAll({
-    where: { user_id: userId, user_choose: 'like' }
+    where: { user_id: userId, user_choose: 'like' },
+    order: [['id', 'DESC']]
   }).then(books => {
     if (typeof books !== 'undefined' && books.length > 0) {
       var bookArray = JSON.parse(JSON.stringify(books));
