@@ -115,6 +115,20 @@ RecommendedBooks.prototype.getAllLikedBooksOfUser = function (userId, callback) 
   });
 }
 
+RecommendedBooks.prototype.getRecommendBookToChangeStatus = function(userId, messageId, callback) {
+  recommendedBook.findOne({
+    where: {user_id: userId, message_id: messageId, user_choose: 'recommend'}
+  }).then(book => {
+    var bookData = JSON.parse(JSON.stringify(book));
+    var data = {
+      book_id: bookData.book_id,
+    }
+    callback(null, data);
+  }).catch(err => {
+    callback(new Error("Server problem"));
+  });
+}
+
 RecommendedBooks.prototype.updateRecommendedBookStatus = function (userId, messageId, status, callback) {
   recommendedBook.update({ user_choose: status}, {
     where: { user_id: userId, message_id: messageId, user_choose: 'recommend' },

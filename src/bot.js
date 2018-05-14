@@ -219,6 +219,7 @@ module.exports = function(token, options) {
       if (action === 'like') {
         var userId = telegramOptions.chat_id;
         var messageId = telegramOptions.message_id - 1;
+        func.saveLikedOrReadBooks(userId, messageId, 'like');
         func.updateRecommendedBookStatus(userId, messageId, 'like');
         func.getRecommendBookForUser(userId, messageId, function (req, res) {
           if (req) {
@@ -232,6 +233,7 @@ module.exports = function(token, options) {
       if (action === 'read') {
         var userId = telegramOptions.chat_id;
         var messageId = telegramOptions.message_id - 1;
+        func.saveLikedOrReadBooks(userId, messageId, 'read');
         func.updateRecommendedBookStatus(userId, messageId, 'read');
         func.getRecommendBookForUser(userId, messageId, function (req, res) {
           if (req) {

@@ -22,7 +22,6 @@ var recommendation = new Recommendation();
 function BotFunctions() {
   this._randBook = 0;
   this._addedToRead = 0;
-  this._recommendBook = [];
   this._likedBooksOptions = {};
   this._readBooksOptions = {};
   this._howSaved = [];
@@ -76,15 +75,9 @@ BotFunctions.prototype.getRecommendationBook = function(userId, messageId, callb
     [{ text: 'читал (а)', callback_data: 'read'}],
     [{ text: 'не нравится', callback_data: 'dislike'}]
   ];
-  var recommend = [];
   var options = buildInlineKeyboards(buttons);
   recommendation.getRecommendBook(userId, messageId, function (book) {
     var id = book.id;
-    recommend.push({
-      message_id: messageId,
-      user_id: userId,
-      book_id: id
-    });
     displayBook(id, function (err, text) {
       if (err) {
         callback(new Error("Server error"));
@@ -97,7 +90,6 @@ BotFunctions.prototype.getRecommendationBook = function(userId, messageId, callb
       }
     });
   });
-  this._recommendBook = recommend;
 }
 
 BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, callback) {
@@ -390,30 +382,33 @@ BotFunctions.prototype.getFoundBooks = function(searchBook, callback) {
   })
 }
 
+BotFunctions.prototype.saveLikedOrReadBooks = function (userId, messageId, status) {
+  recommendedBooks.getRecommendBookToChangeStatus(userId, messageId, function (req, res) {
+    if (req) {
+      console.log(req);
+    } else {
+      var bookId = res.book_id;
+      if (status === 'read') {
+        readBooks.setBook(userId, bookId);
+      }
+      if (status === 'like') {
+        likedBooks.setBook(userId, bookId);
+      }
+    }
+  });
+}
+
 BotFunctions.prototype.updateRecommendedBookStatus = function (userId, messageId, status) {
-  var recommend = this._recommendBook;
   recommendedBooks.updateRecommendedBookStatus(userId, messageId, status, function (req, res) {
     if (req) {
       console.log(req);
     } else {
-      console.log("Рекомендованная книга" + recommend);
-      for (var i = 0; i < recommend.length; i++) {
-        if (recommend[i].user_id === userId && recommend[i].message_id === messageId) {
-          var bookId = recommend[i].book_id;
-          if (status === 'read') {
-            readBooks.setBook(userId, bookId);
-          }
-          if (status === 'liked') {
-            likedBooks.setBook(userId, bookId);
-          }
-        }
-      }
+      console.log(res);
     }
   });
 };
 
 BotFunctions.prototype.getRecommendBookForUser = function (userId, messageId, callback) {
-  var recommend = [];
   recommendation.formRecommendBookForUser(userId, messageId, function (req, book) {
     if (req) {
       callback(new Error("Server error"));
@@ -421,11 +416,6 @@ BotFunctions.prototype.getRecommendBookForUser = function (userId, messageId, ca
       if (book === 'empty') {
         recommendation.getRecommendBook(userId, messageId, function (book) {
           var id = book.id;
-          recommend.push({
-            message_id: messageId,
-            user_id: userId,
-            book_id: id
-          });
           displayBook(id, function (err, text) {
             if (err) {
               callback(new Error("Server error"));
@@ -439,11 +429,6 @@ BotFunctions.prototype.getRecommendBookForUser = function (userId, messageId, ca
         });
       } else {
         var id = book.id;
-        recommend = {
-          message_id: messageId,
-          user_id: userId,
-          book_id: id
-        }
         displayBook(id, function (err, text) {
           if (err) {
             callback(new Error("Server error"));
@@ -457,7 +442,6 @@ BotFunctions.prototype.getRecommendBookForUser = function (userId, messageId, ca
       }
     }
   });
-  this._recommendBook = recommend;
 }
 
 module.exports = BotFunctions;
