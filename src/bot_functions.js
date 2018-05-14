@@ -120,7 +120,6 @@ BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, call
       var buttons = [
         [
           { text: "<<", callback_data: "prev"},
-          { text: "список", callback_data: "list" },
           { text: ">>", callback_data: "next"}
         ]
       ];
