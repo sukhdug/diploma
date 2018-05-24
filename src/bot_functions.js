@@ -273,7 +273,7 @@ BotFunctions.prototype.getRandomBook = function(callback) {
      { text: "читал(а)", callback_data: "imread"}]
   ];
   var options = buildInlineKeyboards(buttons);
-  var rand = randomInt(1, 422);
+  var rand = randomInt(1, 747);
   this._randBook = rand;
   displayBook(rand, function (err, text) {
     if (err) {
@@ -296,7 +296,7 @@ BotFunctions.prototype.editRandomBook = function(callback) {
     { text: "читал(а)", callback_data: "imread"}]
   ];
   var options = buildInlineKeyboards(buttons);
-  var rand = randomInt(1, 422);
+  var rand = randomInt(1, 747);
   this._randBook = rand;
   var addedToRead = this._addedToRead;
   displayBook(rand, function (err, text) {

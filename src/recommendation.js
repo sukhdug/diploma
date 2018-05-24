@@ -30,7 +30,7 @@ function callHimselfForm(userId) {
 }
 
 Recommendation.prototype.getRecommendBook = function (userId, messageId, callback) {
-  var rand = randomInt(1, 931);
+  var rand = randomInt(1, 1073);
   var reviewId = rand;
   recommendedBooks.checkExistRecommendedBookByReview(reviewId, userId, function (result) {
     if (result === 'empty') {

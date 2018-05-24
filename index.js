@@ -1,6 +1,6 @@
 'use strict';
 
-var token = '421083324:AAFfmcqVjwvczTiv8X_MKJHr07-JyFDcBJ4',
+var token = process.env.TOKEN,
   options = {
     webHook: 0,
     port: 0
