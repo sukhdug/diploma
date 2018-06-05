@@ -1,25 +1,25 @@
 'use strict';
 
-var LikedBook = require('./../entity/LikedBook');
+var SavedBook = require('./../entity/SavedBook');
 var Book = require('./../entity/Book');
 
-var likedBook = LikedBook;
+var savedBook = SavedBook;
 var book = Book;
 
-function LikedBooks() {
+function SavedBooks() {
 }
 
-LikedBooks.prototype.setBook = function (userId, bookId) {
-  likedBook.findOrCreate({ where: { user_id: userId, book_id: bookId, status: 'added'}})
+SavedBooks.prototype.setBook = function (userId, bookId) {
+  savedBook.findOrCreate({ where: { user_id: userId, book_id: bookId, status: 'added'}})
   .spread((book, created) => {
     console.log(created);
   }).catch( function (err) {
-    console.log(new Error("Server problem"));
+    callback(new Error("Server problem"));
   });
 };
 
-LikedBooks.prototype.getLikedBook = function (id, callback) {
-  likedBook.findOne({
+SavedBooks.prototype.getSavedBook = function (id, callback) {
+  savedBook.findOne({
     where: { user_id: id },
     inlcude: [{
       model: book
@@ -39,8 +39,8 @@ LikedBooks.prototype.getLikedBook = function (id, callback) {
   });
 };
 
-LikedBooks.prototype.getListUserBooks = function (userId, callback) {
-  likedBook.findAll({
+SavedBooks.prototype.getListUserBooks = function (userId, callback) {
+  savedBook.findAll({
     where: {user_id: userId, status: 'added'},
     order: [
       [book, 'name', 'ASC']
@@ -59,7 +59,7 @@ LikedBooks.prototype.getListUserBooks = function (userId, callback) {
     callback(null, booksList);
   }).catch( function (err) {
     callback(new Error("Server problem"));
-  });;
+  });
 }
 
-module.exports = LikedBooks;
+module.exports = SavedBooks;

@@ -1,62 +1,31 @@
-'use strict';
-
-var Books = require('./model/Books');
-var ReadBooks = require('./model/ReadBooks');
-var LikedBooks = require('./model/LikedBooks');
-var Users = require('./model/Users');
-var Reviews = require('./model/Reviews');
-var BotCommands = require('./model/BotCommands');
-var Recommendation = require('./recommendation');
-var RecommendedBooks = require('./model/RecommendedBooks');
+const Books = require('./model/Books');
+const ReadBooks = require('./model/ReadBooks');
+const LikedBooks = require('./model/LikedBooks');
+const SavedBooks = require('./model/SavedBooks');
+const Users = require('./model/Users');
+const Reviews = require('./model/Reviews');
+const BotCommands = require('./model/BotCommands');
+const Recommendation = require('./recommendation');
+const RecommendedBooks = require('./model/RecommendedBooks');
 
 // создаем экземпляры моделей
-var books = new Books();
-var botCommands = new BotCommands();
-var users = new Users();
-var likedBooks = new LikedBooks();
-var readBooks = new ReadBooks();
-var recommendedBooks = new RecommendedBooks();
-var reviews = new Reviews();
-var recommendation = new Recommendation();
+let books = new Books();
+let botCommands = new BotCommands();
+let users = new Users();
+let likedBooks = new LikedBooks();
+let readBooks = new ReadBooks();
+let savedBooks = new SavedBooks();
+let recommendedBooks = new RecommendedBooks();
+let reviews = new Reviews();
+let recommendation = new Recommendation();
 
 function BotFunctions() {
   this._randBook = 0;
   this._addedToRead = 0;
+  this._addedToSaved = 0;
   this._likedBooksOptions = {};
   this._readBooksOptions = {};
   this._howSaved = [];
-}
-
-function randomInt(min, max) {
-  var num = min - 0.5 + Math.random() * (max - min + 1);
-  num = Math.round(num);
-  return num;
-}
-
-function displayBook(id, callback) {
-  books.getBook(id, function (err, bookArray) {
-    if (err) {
-      console.log(err);
-      callback(new Error("Книга не найдена"));
-    } else {
-      var text = "<b>Название книги:</b> " + bookArray.name +
-          "\n<b>Автор:</b> " + bookArray.authors + "\n<b>Жанры:</b> " + bookArray.genres +
-          "\n<b>Описание книги:</b>\n" + bookArray.description +
-          "\n<a href='" + bookArray.link + "'>Читать рецензии на сайте LiveLib</a>";
-      callback(null, text);
-    }
-  });
-}
-
-function buildInlineKeyboards(buttons) {
-  var options = {
-    reply_markup: JSON.stringify({
-      inline_keyboard: buttons,
-      parse_mode: "HTML"
-    }),
-    parse_mode: "HTML"
-  }
-  return options;
 }
 
 BotFunctions.prototype.getCommandResult = function(command, callback) {
@@ -273,7 +242,7 @@ BotFunctions.prototype.getRandomBook = function(callback) {
      { text: "читал(а)", callback_data: "imread"}]
   ];
   var options = buildInlineKeyboards(buttons);
-  var rand = randomInt(1, 747);
+  var rand = randomInt(1, 1140);
   this._randBook = rand;
   displayBook(rand, function (err, text) {
     if (err) {
@@ -296,9 +265,10 @@ BotFunctions.prototype.editRandomBook = function(callback) {
     { text: "читал(а)", callback_data: "imread"}]
   ];
   var options = buildInlineKeyboards(buttons);
-  var rand = randomInt(1, 747);
+  var rand = randomInt(1, 1140);
   this._randBook = rand;
   var addedToRead = this._addedToRead;
+  var addedToSaved = this._addedToSaved;
   displayBook(rand, function (err, text) {
     if (err) {
       callback(new Error('Книга не найдена'));
@@ -306,12 +276,14 @@ BotFunctions.prototype.editRandomBook = function(callback) {
       var getData = {
         text: text,
         buttons: options,
-        read: (addedToRead === 1 ? true : false)
+        read: (addedToRead === 1 ? true : false),
+        saved: (addedToSaved === 1 ? true : false)
       }
       callback(null, getData);
     }
   });
   this._addedToRead = 0;
+  this._addedToSaved = 0;
 }
 
 BotFunctions.prototype.setToReadRandomBook = function(params, callback) {
@@ -325,6 +297,21 @@ BotFunctions.prototype.setToReadRandomBook = function(params, callback) {
   var bookId = this._randBook;
   var userId = params.chat_id;
   readBooks.setBook(userId, bookId);
+  var options = buildInlineKeyboards(buttons);
+  callback(null, options);
+}
+
+BotFunctions.prototype.setToSavedRandomBook = function(params, callback) {
+  var buttons = [
+    [{ text: "показать другую", callback_data: "other"}],
+    [{ text: "добавлено в сохраненные", callback_data: "..." }],
+    [{ text: "читал (а)", callback_data: "imread"}]
+  ];
+  var options = buildInlineKeyboards(buttons);
+  this._addedToSaved = 1;
+  var bookId = this._randBook;
+  var userId = params.chat_id;
+  savedBooks.setBook(userId, bookId);
   var options = buildInlineKeyboards(buttons);
   callback(null, options);
 }
@@ -442,6 +429,38 @@ BotFunctions.prototype.getRecommendBookForUser = function (userId, messageId, ca
       }
     }
   });
+}
+
+function randomInt(min, max) {
+  var num = min - 0.5 + Math.random() * (max - min + 1);
+  num = Math.round(num);
+  return num;
+}
+
+function displayBook(id, callback) {
+  books.getBook(id, function (err, bookArray) {
+    if (err) {
+      console.log(err);
+      callback(new Error("Книга не найдена"));
+    } else {
+      var text = "<b>Название книги:</b> " + bookArray.name +
+          "\n<b>Автор:</b> " + bookArray.authors + "\n<b>Жанры:</b> " + bookArray.genres +
+          "\n<b>Описание книги:</b>\n" + bookArray.description +
+          "\n<a href='" + bookArray.link + "'>Читать рецензии на сайте LiveLib</a>";
+      callback(null, text);
+    }
+  });
+}
+
+function buildInlineKeyboards(buttons) {
+  var options = {
+    reply_markup: JSON.stringify({
+      inline_keyboard: buttons,
+      parse_mode: "HTML"
+    }),
+    parse_mode: "HTML"
+  }
+  return options;
 }
 
 module.exports = BotFunctions;

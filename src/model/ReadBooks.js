@@ -18,15 +18,6 @@ ReadBooks.prototype.setBook = function (userId, bookId) {
   });
 };
 
-ReadBooks.prototype.getReadBookId = function (id, callback) {
-  readBook.findOne({where: {book_id: id}, attributes: ['id']}).then(book => {
-    var id = JSON.parse(JSON.stringify(book));
-    callback(null, id);
-  }).catch( function (err) {
-    callback(new Error("Server problem"));
-  });
-};
-
 ReadBooks.prototype.getReadBook = function (id, callback) {
   readBook.findOne({
     where: { user_id: id },

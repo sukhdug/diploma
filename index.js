@@ -1,6 +1,4 @@
-'use strict';
-
-var token = process.env.TOKEN,
+let token = process.env.TOKEN,
   options = {
     webHook: 0,
     port: 0

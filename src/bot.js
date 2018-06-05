@@ -176,9 +176,19 @@ module.exports = function(token, options) {
             bot.editMessageText("Ошибка сервера! Попробуйте позже", { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
           } else {
             bot.editMessageText(res.text, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
-            if (res.read) {
+            if (res.read || res.saved) {
               bot.editMessageReplyMarkup( res.buttons.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
             }
+          }
+        });
+      }
+      if (action === 'save') {
+        func.setToSavedRandomBook(telegramOptions, function (req, res) {
+          if (req) {
+            console.log(req);
+            bot.editMessageText("Ошибка сервера! Попробуйте позже", { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
+          } else {
+            bot.editMessageReplyMarkup( res.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
           }
         });
       }
