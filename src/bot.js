@@ -1,7 +1,5 @@
-'use strict';
-
-var TelegramBot = require('node-telegram-bot-api');
-var Functions = require('./bot_functions');
+const TelegramBot = require('node-telegram-bot-api');
+const Functions = require('./bot_functions');
 
 // helper function -> exit with error
 var exit = function (msg) {
@@ -19,11 +17,11 @@ module.exports = function(token, options) {
 
   // check if the bot should use a webHook
   // проверка, если бот будет работать в режиме webHook
-  var webHook = options.webHook;
+  let webHook = options.webHook;
 
   // set bot mode (polling vs webHook) depending ok the environment
   // здесь задаем, в каком режиме (polling vs webHook) будет работать бот
-  var botOptions = {};
+  let botOptions = {};
   if (webHook) {
     botOptions.webHook = {
       port: options.port || 5000,
@@ -34,17 +32,17 @@ module.exports = function(token, options) {
   }
 
   // create Bot
-  var bot = new TelegramBot(token, botOptions);
+  let bot = new TelegramBot(token, botOptions);
   if (webHook) {
     bot.setWebHook(webHook + ':443/bot' + token);
   }
   // В Functions() находятся все функции, которые возвращают callbackом
   // все данные, необходимые для отправки сообщений пользователю
-  var func = new Functions();
+  let func = new Functions();
 
   bot.getMe().then( function (me) {
     var botName =  '@' + me.username;
-
+/*
     bot.onText(/\/search ([а-яА-Я]+)/, function (msg, match) {
       var chatId = msg.chat.id;
       var searchBook = msg.text.replace('/search ', '');
@@ -62,7 +60,7 @@ module.exports = function(token, options) {
         }
       });
     });
-
+*/
     bot.on('text', function (msg) {
       var command = msg.text.replace(botName, '');
       var chatId = msg.chat.id;
@@ -147,6 +145,8 @@ module.exports = function(token, options) {
               }
             }
           });
+          break;
+        case /\/search ([а-яА-Я]+)/.test(command):
           break;
         case '/search':
           bot.sendMessage(chatId, "Чтобы найти книги по названию, отправьте сообщение /search [название книги]\n" +
