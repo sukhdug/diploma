@@ -28,7 +28,7 @@ function BotFunctions() {
   this._howSaved = [];
 }
 
-BotFunctions.prototype.getCommandResult = function(command, callback) {
+BotFunctions.prototype.getCommandResult = (command, callback) => {
   botCommands.getCommandDescription(command, (req, res) => {
     if (req) {
       callback(new Error("500 Server Error"));
@@ -38,7 +38,7 @@ BotFunctions.prototype.getCommandResult = function(command, callback) {
   });
 }
 
-BotFunctions.prototype.getRecommendationBook = function(userId, messageId, callback) {
+BotFunctions.prototype.getRecommendationBook = (userId, messageId, callback) => {
   var buttons = [
     [{ text: 'нравится', callback_data: 'like'}],
     [{ text: 'читал (а)', callback_data: 'read'}],
@@ -61,7 +61,7 @@ BotFunctions.prototype.getRecommendationBook = function(userId, messageId, callb
   });
 }
 
-BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, callback) {
+BotFunctions.prototype.getSavedBooks = (chatId, messageId, howSave, callback) => {
   var object = null;
   var savedBooksOptions = {};
   this._howSaved.push({
@@ -117,7 +117,7 @@ BotFunctions.prototype.getSavedBooks = function(chatId, messageId, howSave, call
   }
 }
 
-BotFunctions.prototype.showNextSavedBooks = function(params, callback) {
+BotFunctions.prototype.showNextSavedBooks = (params, callback) => {
   var object = null;
   var chatId = params.chat_id;
   var options = {};
@@ -177,7 +177,7 @@ BotFunctions.prototype.showNextSavedBooks = function(params, callback) {
   if (howSaved == 'liked') this._likedBooksOptions = options;
 }
 
-BotFunctions.prototype.showPrevSavedBooks = function(params, callback) {
+BotFunctions.prototype.showPrevSavedBooks = (params, callback) => {
   var object = null;
   var chatId = params.chat_id;
   var options = {};
@@ -235,14 +235,14 @@ BotFunctions.prototype.showPrevSavedBooks = function(params, callback) {
   if (howSaved == 'liked') this._likedBooksOptions = options;
 }
 
-BotFunctions.prototype.getRandomBook = function(callback) {
+BotFunctions.prototype.getRandomBook = callback => {
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
     [{ text: "сохранить", callback_data: "save"},
      { text: "читал(а)", callback_data: "imread"}]
   ];
   var options = buildInlineKeyboards(buttons);
-  var rand = randomInt(1, 1140);
+  var rand = randomInt(1, 1324);
   this._randBook = rand;
   displayBook(rand, function (err, text) {
     if (err) {
@@ -258,14 +258,14 @@ BotFunctions.prototype.getRandomBook = function(callback) {
   });
 }
 
-BotFunctions.prototype.editRandomBook = function(callback) {
+BotFunctions.prototype.editRandomBook = callback => {
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
     [{ text: "сохранить", callback_data: "save"},
     { text: "читал(а)", callback_data: "imread"}]
   ];
   var options = buildInlineKeyboards(buttons);
-  var rand = randomInt(1, 1140);
+  var rand = randomInt(1, 1324);
   this._randBook = rand;
   var addedToRead = this._addedToRead;
   var addedToSaved = this._addedToSaved;
@@ -286,7 +286,7 @@ BotFunctions.prototype.editRandomBook = function(callback) {
   this._addedToSaved = 0;
 }
 
-BotFunctions.prototype.setToReadRandomBook = function(params, callback) {
+BotFunctions.prototype.setToReadRandomBook = (params, callback) => {
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
     [{ text: "сохранить", callback_data: "save" }],
@@ -301,7 +301,7 @@ BotFunctions.prototype.setToReadRandomBook = function(params, callback) {
   callback(null, options);
 }
 
-BotFunctions.prototype.setToSavedRandomBook = function(params, callback) {
+BotFunctions.prototype.setToSavedRandomBook = (params, callback) => {
   var buttons = [
     [{ text: "показать другую", callback_data: "other"}],
     [{ text: "добавлено в сохраненные", callback_data: "..." }],
@@ -316,7 +316,7 @@ BotFunctions.prototype.setToSavedRandomBook = function(params, callback) {
   callback(null, options);
 }
 
-BotFunctions.prototype.getFoundBooks = function(searchBook, callback) {
+BotFunctions.prototype.getFoundBooks = (searchBook, callback) => {
   books.getListFoundBooks(searchBook, function (err, books) {
     if (err) {
       callback(new Error("500 Server Error"));
@@ -369,7 +369,7 @@ BotFunctions.prototype.getFoundBooks = function(searchBook, callback) {
   })
 }
 
-BotFunctions.prototype.saveLikedOrReadBooks = function (userId, messageId, status) {
+BotFunctions.prototype.saveLikedOrReadBooks = (userId, messageId, status) => {
   recommendedBooks.getRecommendBookToChangeStatus(userId, messageId, function (req, res) {
     if (req) {
       console.log(req);
@@ -385,7 +385,7 @@ BotFunctions.prototype.saveLikedOrReadBooks = function (userId, messageId, statu
   });
 }
 
-BotFunctions.prototype.updateRecommendedBookStatus = function (userId, messageId, status) {
+BotFunctions.prototype.updateRecommendedBookStatus = (userId, messageId, status) => {
   recommendedBooks.updateRecommendedBookStatus(userId, messageId, status, function (req, res) {
     if (req) {
       console.log(req);
@@ -395,7 +395,7 @@ BotFunctions.prototype.updateRecommendedBookStatus = function (userId, messageId
   });
 };
 
-BotFunctions.prototype.getRecommendBookForUser = function (userId, messageId, callback) {
+BotFunctions.prototype.getRecommendBookForUser = (userId, messageId, callback) => {
   recommendation.formRecommendBookForUser(userId, messageId, function (req, book) {
     if (req) {
       callback(new Error("Server error"));
@@ -432,7 +432,7 @@ BotFunctions.prototype.getRecommendBookForUser = function (userId, messageId, ca
 }
 
 function randomInt(min, max) {
-  var num = min - 0.5 + Math.random() * (max - min + 1);
+  let num = min - 0.5 + Math.random() * (max - min + 1);
   num = Math.round(num);
   return num;
 }
@@ -443,7 +443,7 @@ function displayBook(id, callback) {
       console.log(err);
       callback(new Error("Книга не найдена"));
     } else {
-      var text = "<b>Название книги:</b> " + bookArray.name +
+      let text = "<b>Название книги:</b> " + bookArray.name +
           "\n<b>Автор:</b> " + bookArray.authors + "\n<b>Жанры:</b> " + bookArray.genres +
           "\n<b>Описание книги:</b>\n" + bookArray.description +
           "\n<a href='" + bookArray.link + "'>Читать рецензии на сайте LiveLib</a>";
@@ -453,7 +453,7 @@ function displayBook(id, callback) {
 }
 
 function buildInlineKeyboards(buttons) {
-  var options = {
+  let options = {
     reply_markup: JSON.stringify({
       inline_keyboard: buttons,
       parse_mode: "HTML"

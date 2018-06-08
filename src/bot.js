@@ -152,8 +152,8 @@ module.exports = function(token, options) {
           bot.sendMessage(chatId, "Чтобы найти книги по названию, отправьте сообщение /search [название книги]\n" +
           "например, /search Жизнь Галилея");
           break;
-        //default:
-        //  bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
+        default:
+          bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
       }
     });
 
