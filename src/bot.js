@@ -48,9 +48,9 @@ module.exports = function(token, options) {
     bot.onText(/\/search ([а-яА-Я]+)/, function (msg, match) {
       var chatId = msg.chat.id;
       var searchBook = msg.text.replace('/search ', '');
-      func.getFoundBooks(searchBook, function (req, res) {
-        if (req) {
-          console.log(req);
+      func.getFoundBooks(searchBook, function (err, res) {
+        if (err) {
+          console.log(err);
           bot.sendMessage(chatId, "500 Server Error! Sorry :-(");
         } else {
           if (res.pages > 1) {
@@ -69,9 +69,9 @@ module.exports = function(token, options) {
       var user = msg.chat.username;
       switch (command) {
         case '/start':
-          func.getCommandResult('start', function (req, res) {
-            if (req) {
-              console.log(req);
+          func.getCommandResult('start', function (err, res) {
+            if (err) {
+              console.log(err);
               bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
             } else {
               bot.sendMessage(chatId, res, { parse_mode: "HTML" });
@@ -79,9 +79,9 @@ module.exports = function(token, options) {
           });
           break;
         case '/help':
-          func.getCommandResult('help', function (req, res) {
-            if (req) {
-              console.log(req);
+          func.getCommandResult('help', function (err, res) {
+            if (err) {
+              console.log(err);
               bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
             } else {
               bot.sendMessage(chatId, res, { parse_mode: "HTML" });
@@ -90,9 +90,9 @@ module.exports = function(token, options) {
           break;
         case '/recommendation':
           var messageId = msg.message_id + 1;
-          func.getRecommendationBook(chatId, messageId, function (req, res) {
-            if (req) {
-              console.log(req);
+          func.getRecommendationBook(chatId, messageId, function (err, res) {
+            if (err) {
+              console.log(err);
               bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
             } else {
               bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
@@ -103,9 +103,9 @@ module.exports = function(token, options) {
           });
           break;
         case '/random':
-          func.getRandomBook(function (req, res) {
-            if (req) {
-              console.log(req);
+          func.getRandomBook(function (err, res) {
+            if (err) {
+              console.log(err);
               bot.sendMessage(chatId, "404 Книга не найдена", { parse_mode: "HTML" });
             } else {
               console.log(res);
@@ -118,9 +118,9 @@ module.exports = function(token, options) {
           break;
         case '/read':
           var messageId = msg.message_id + 1;
-          func.getSavedBooks(chatId, messageId, 'read', function (req, res) {
-            if (req) {
-              console.log(req);
+          func.getSavedBooks(chatId, messageId, 'read', function (err, res) {
+            if (err) {
+              console.log(err);
               bot.sendMessage(chatId, "К сожалению, сервер не нашел книг. Попробуйте сохранить книги в этот раздел.");
             } else {
               bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
@@ -134,9 +134,9 @@ module.exports = function(token, options) {
           break;
         case '/like':
           var messageId = msg.message_id + 1;
-          func.getSavedBooks(chatId, messageId, 'liked', function (req, res) {
-            if (req) {
-              console.log(req);
+          func.getSavedBooks(chatId, messageId, 'liked', function (err, res) {
+            if (err) {
+              console.log(err);
               bot.sendMessage(chatId, "К сожалению, сервер не нашел книг. Попробуйте сохранить книги в этот раздел");
             } else {
               if (res.length > 1) {
@@ -170,9 +170,9 @@ module.exports = function(token, options) {
         bot.editMessageText(text, telegramOptions);
       }
       if (action === 'other') {
-        func.editRandomBook(function (req, res) {
-          if (req) {
-            console.log(req);
+        func.editRandomBook(function (err, res) {
+          if (err) {
+            console.log(err);
             bot.editMessageText("Ошибка сервера! Попробуйте позже", { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
           } else {
             bot.editMessageText(res.text, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
@@ -183,9 +183,9 @@ module.exports = function(token, options) {
         });
       }
       if (action === 'save') {
-        func.setToSavedRandomBook(telegramOptions, function (req, res) {
-          if (req) {
-            console.log(req);
+        func.setToSavedRandomBook(telegramOptions, function (err, res) {
+          if (err) {
+            console.log(err);
             bot.editMessageText("Ошибка сервера! Попробуйте позже", { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
           } else {
             bot.editMessageReplyMarkup( res.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
@@ -193,9 +193,9 @@ module.exports = function(token, options) {
         });
       }
       if (action === 'imread') {
-        func.setToReadRandomBook(telegramOptions, function (req, res) {
-          if (req) {
-            console.log(req);
+        func.setToReadRandomBook(telegramOptions, function (err, res) {
+          if (err) {
+            console.log(err);
             bot.editMessageText("Ошибка сервера! Попробуйте позже", { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id , parse_mode: "HTML"});
           } else {
             bot.editMessageReplyMarkup( res.reply_markup, { message_id: telegramOptions.message_id, chat_id: telegramOptions.chat_id });
@@ -203,9 +203,9 @@ module.exports = function(token, options) {
         });
       }
       if (action === 'next') {
-        func.showNextSavedBooks(telegramOptions, function (req, res) {
-          if (req) {
-            console.log(req);
+        func.showNextSavedBooks(telegramOptions, function (err, res) {
+          if (err) {
+            console.log(err);
             bot.sendMessage(telegramOptions.chat_id, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
           } else {
             bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
@@ -213,9 +213,9 @@ module.exports = function(token, options) {
         });
       }
       if (action === 'prev') {
-        func.showPrevSavedBooks(telegramOptions, function (req, res) {
-          if (req) {
-            console.log(req);
+        func.showPrevSavedBooks(telegramOptions, function (err, res) {
+          if (err) {
+            console.log(err);
             bot.sendMessage(telegramOptions.chat_id, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
           } else {
             bot.editMessageText(res, { message_id: telegramOptions.message_id - 1, chat_id: telegramOptions.chat_id, parse_mode: "HTML" });
@@ -231,9 +231,9 @@ module.exports = function(token, options) {
         var messageId = telegramOptions.message_id - 1;
         func.saveLikedOrReadBooks(userId, messageId, 'like');
         func.updateRecommendedBookStatus(userId, messageId, 'like');
-        func.getRecommendBookForUser(userId, messageId, function (req, res) {
-          if (req) {
-            console.log(req);
+        func.getRecommendBookForUser(userId, messageId, function (err, res) {
+          if (err) {
+            console.log(err);
             bot.editMessageText("Серверная ошибка! Попробуйте позже!", { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
           } else {
             bot.editMessageText(res.text, { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
@@ -245,9 +245,9 @@ module.exports = function(token, options) {
         var messageId = telegramOptions.message_id - 1;
         func.saveLikedOrReadBooks(userId, messageId, 'read');
         func.updateRecommendedBookStatus(userId, messageId, 'read');
-        func.getRecommendBookForUser(userId, messageId, function (req, res) {
-          if (req) {
-            console.log(req);
+        func.getRecommendBookForUser(userId, messageId, function (err, res) {
+          if (err) {
+            console.log(err);
             bot.editMessageText("Серверная ошибка! Попробуйте позже!", { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
           } else {
             bot.editMessageText(res.text, { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
@@ -258,9 +258,9 @@ module.exports = function(token, options) {
         var userId = telegramOptions.chat_id;
         var messageId = telegramOptions.message_id - 1;
         func.updateRecommendedBookStatus(userId, messageId, 'dislike');
-        func.getRecommendBookForUser(userId, messageId, function (req, res) {
-          if (req) {
-            console.log(req);
+        func.getRecommendBookForUser(userId, messageId, function (err, res) {
+          if (err) {
+            console.log(err);
             bot.editMessageText("Серверная ошибка! Попробуйте позже!", { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
           } else {
             bot.editMessageText(res.text, { message_id: messageId, chat_id: userId, parse_mode: "HTML" });
