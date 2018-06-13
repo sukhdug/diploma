@@ -42,121 +42,118 @@ module.exports = function(token, options) {
 
   bot.getMe().then( function (me) {
     var botName =  '@' + me.username;
-/*
-    bot.onText(/\/search ([а-яА-Я]+)/, function (msg, match) {
-      var chatId = msg.chat.id;
-      var searchBook = msg.text.replace('/search ', '');
-      func.getFoundBooks(searchBook, function (err, res) {
-        if (err) {
-          console.log(err);
-          bot.sendMessage(chatId, "500 Server Error! Sorry :-(");
-        } else {
-          if (res.pages > 1) {
-            var options = res.options;
-            bot.sendMessage(chatId, res.text, options);
-          } else {
-            bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-          }
-        }
-      });
-    });
-*/
+
     bot.on('text', function (msg) {
       var command = msg.text.replace(botName, '');
+      var search = /\/search ([a-zA-Zа-яА-Я]+)/.test(command);
       var chatId = msg.chat.id;
       var user = msg.chat.username;
-      switch (command) {
-        case '/start':
-          func.getCommandResult('start', function (err, res) {
-            if (err) {
-              console.log(err);
-              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
-            } else {
-              bot.sendMessage(chatId, res, { parse_mode: "HTML" });
-            }
-          });
-          break;
-        case '/help':
-          func.getCommandResult('help', function (err, res) {
-            if (err) {
-              console.log(err);
-              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
-            } else {
-              bot.sendMessage(chatId, res, { parse_mode: "HTML" });
-            }
-          });
-          break;
-        case '/recommendation':
-          var messageId = msg.message_id + 1;
-          func.getRecommendationBook(chatId, messageId, function (err, res) {
-            if (err) {
-              console.log(err);
-              bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+      if (search) {
+        var searchBook = command.replace('/search ', '');
+        func.getFoundBooks(searchBook, function (err, res) {
+          if (err) {
+            console.log(err);
+            bot.sendMessage(chatId, "500 Server Error! Sorry :-(");
+          } else {
+            if (res.pages > 1) {
+              var options = res.options;
+              bot.sendMessage(chatId, res.text, options);
             } else {
               bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-              setTimeout( function () {
-                bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", res.buttons);
-              }, 1000);
             }
-          });
-          break;
-        case '/random':
-          func.getRandomBook(function (err, res) {
-            if (err) {
-              console.log(err);
-              bot.sendMessage(chatId, "404 Книга не найдена", { parse_mode: "HTML" });
-            } else {
-              console.log(res);
-              bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-              setTimeout( function() {
-                bot.sendMessage(chatId, "Выберите один из вариантов", res.buttons);
-              }, 1000);
-            }
-          });
-          break;
-        case '/read':
-          var messageId = msg.message_id + 1;
-          func.getSavedBooks(chatId, messageId, 'read', function (err, res) {
-            if (err) {
-              console.log(err);
-              bot.sendMessage(chatId, "К сожалению, сервер не нашел книг. Попробуйте сохранить книги в этот раздел.");
-            } else {
-              bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
-              if (res.length > 1) {
-                setTimeout( function() {
-                  bot.sendMessage(chatId, "Ваши прочитанные книги", res.options);
+          }
+        });
+      } else {
+        switch (command) {
+          case '/start':
+            func.getCommandResult('start', function (err, res) {
+              if (err) {
+                console.log(err);
+                bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+              } else {
+                bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+              }
+            });
+            break;
+          case '/help':
+            func.getCommandResult('help', function (err, res) {
+              if (err) {
+                console.log(err);
+                bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+              } else {
+                bot.sendMessage(chatId, res, { parse_mode: "HTML" });
+              }
+            });
+            break;
+          case '/recommendation':
+            var messageId = msg.message_id + 1;
+            func.getRecommendationBook(chatId, messageId, function (err, res) {
+              if (err) {
+                console.log(err);
+                bot.sendMessage(chatId, "500 Server Error! Sorry :-(", { parse_mode: "HTML" });
+              } else {
+                bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+                setTimeout( function () {
+                  bot.sendMessage(chatId, "Выберите, чтобы получить еще рекомендацию", res.buttons);
                 }, 1000);
               }
-            }
-          });
-          break;
-        case '/like':
-          var messageId = msg.message_id + 1;
-          func.getSavedBooks(chatId, messageId, 'liked', function (err, res) {
-            if (err) {
-              console.log(err);
-              bot.sendMessage(chatId, "К сожалению, сервер не нашел книг. Попробуйте сохранить книги в этот раздел");
-            } else {
-              if (res.length > 1) {
+            });
+            break;
+          case '/random':
+            func.getRandomBook(function (err, res) {
+              if (err) {
+                console.log(err);
+                bot.sendMessage(chatId, "404 Книга не найдена", { parse_mode: "HTML" });
+              } else {
+                console.log(res);
                 bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
                 setTimeout( function() {
-                  bot.sendMessage(chatId, "Ваши понравившиеся книги", res.options);
+                  bot.sendMessage(chatId, "Выберите один из вариантов", res.buttons);
                 }, 1000);
               }
-            }
-          });
-          break;
-        case /\/search ([а-яА-Я]+)/.test(command):
-          break;
-        case '/search':
-          bot.sendMessage(chatId, "Чтобы найти книги по названию, отправьте сообщение /search [название книги]\n" +
-          "например, /search Жизнь Галилея");
-          break;
-        default:
-          bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
+            });
+            break;
+          case '/read':
+            var messageId = msg.message_id + 1;
+            func.getSavedBooks(chatId, messageId, 'read', function (err, res) {
+              if (err) {
+                console.log(err);
+                bot.sendMessage(chatId, "К сожалению, сервер не нашел книг. Попробуйте сохранить книги в этот раздел.");
+              } else {
+                bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+                if (res.length > 1) {
+                  setTimeout( function() {
+                    bot.sendMessage(chatId, "Ваши прочитанные книги", res.options);
+                  }, 1000);
+                }
+              }
+            });
+            break;
+          case '/like':
+            var messageId = msg.message_id + 1;
+            func.getSavedBooks(chatId, messageId, 'liked', function (err, res) {
+              if (err) {
+                console.log(err);
+                bot.sendMessage(chatId, "К сожалению, сервер не нашел книг. Попробуйте сохранить книги в этот раздел");
+              } else {
+                if (res.length > 1) {
+                  bot.sendMessage(chatId, res.text, { parse_mode: "HTML" });
+                  setTimeout( function() {
+                    bot.sendMessage(chatId, "Ваши понравившиеся книги", res.options);
+                  }, 1000);
+                }
+              }
+            });
+            break;
+          case '/search':
+            bot.sendMessage(chatId, "Чтобы найти книги по названию, отправьте сообщение /search [название книги]\n" +
+            "например, /search Жизнь Галилея");
+            break;
+          default:
+            bot.sendMessage(chatId, "К сожалению, бот не понимает Вас! Чтобы просмотреть доступные команды, введите /help. Спасибо!");
+        }
       }
     });
-
     bot.on('callback_query', function (callbackQuery) {
       const action = callbackQuery.data;
       const msg = callbackQuery.message;

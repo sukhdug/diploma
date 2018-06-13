@@ -38,7 +38,7 @@ CREATE USER 'diploma'@'localhost' IDENTIFIED BY 'diploma';
 GRANT ALL PRIVILEGES ON diploma.* TO 'diploma'@'localhost';
 FLUSH PRIVILEGES;
 USE diploma;
-source sql/diploma_23_04_18.sql
+source sql/diploma_08_06_18.sql
 exit;
 ```
 Если Вы успешно выполнили команды выше, то вы установили необходимые параметры. Далее можно запускать проект, тестировать через мессенджер Телеграм, модифицировать и т.д.
@@ -49,13 +49,3 @@ exit;
 npm start
 ```
 
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact

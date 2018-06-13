@@ -61,7 +61,7 @@ BotFunctions.prototype.getRecommendationBook = (userId, messageId, callback) => 
   });
 }
 
-BotFunctions.prototype.getSavedBooks = (chatId, messageId, howSave, callback) => {
+BotFunctions.prototype.getSavedBooks = function (chatId, messageId, howSave, callback) {
   var object = null;
   var savedBooksOptions = {};
   this._howSaved.push({
@@ -117,7 +117,7 @@ BotFunctions.prototype.getSavedBooks = (chatId, messageId, howSave, callback) =>
   }
 }
 
-BotFunctions.prototype.showNextSavedBooks = (params, callback) => {
+BotFunctions.prototype.showNextSavedBooks = function (params, callback) {
   var object = null;
   var chatId = params.chat_id;
   var options = {};
@@ -140,7 +140,6 @@ BotFunctions.prototype.showNextSavedBooks = (params, callback) => {
     if (err) {
       callback(new Error("500 Server Error"));
     } else {
-      console.log(books);
       var id = options.next;
       for (var i = 0; i < books.length; i++) {
         if (i === options.nextId && options.nextId === books.length - 1) {
@@ -177,7 +176,7 @@ BotFunctions.prototype.showNextSavedBooks = (params, callback) => {
   if (howSaved == 'liked') this._likedBooksOptions = options;
 }
 
-BotFunctions.prototype.showPrevSavedBooks = (params, callback) => {
+BotFunctions.prototype.showPrevSavedBooks = function (params, callback) {
   var object = null;
   var chatId = params.chat_id;
   var options = {};
@@ -445,8 +444,9 @@ function displayBook(id, callback) {
     } else {
       let text = "<b>Название книги:</b> " + bookArray.name +
           "\n<b>Автор:</b> " + bookArray.authors + "\n<b>Жанры:</b> " + bookArray.genres +
-          "\n<b>Описание книги:</b>\n" + bookArray.description +
-          "\n<a href='" + bookArray.link + "'>Читать рецензии на сайте LiveLib</a>";
+          "\n<b>Описание книги:</b>\n" + bookArray.description;
+    /*  let text = `<b>Название книги: </b>${bookArray.name}\n<b>Автор:
+          </b>${bookarray.authors}\n<b>Жанры: </b>${bookArray.genres}\n${bookArray.description}`;*/
       callback(null, text);
     }
   });
