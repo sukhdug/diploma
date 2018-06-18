@@ -7,7 +7,8 @@
     "start": "node index.js"
   },
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "https://github.com/sukhdug/diploma.git"
   },
   "keywords": [
     "telegram",
@@ -16,8 +17,8 @@
     "reading"
   ],
   "author": "Handy-Surun Dugurzhap",
-  "license": "No License",
-  "homepage": "https://bitbucket.org/sukhdug/telegram-bot",
+  "license": "GPL-2.0",
+  "homepage": "https://github.com/sukhdug/diploma#readme",
   "dependencies": {
     "bluebird": "^3.0.5",
     "mysql": "^2.15.0",
